@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Harness Engineering：11 个 Coding Agent 源码解剖｜论文精读</title>
+<style>
+:root{
+  --ink:#1f1f1f;
+  --paper:#f4f1ea;
+  --paper2:#ebe5da;
+  --card:#fbf8f1;
+  --line:#d8cfbf;
+  --muted:#6f6a63;
+  --dai:#4f5d61;
+  --qing:#5f7b73;
+  --zhu:#a65a4b;
+  --gold:#b08a4f;
+  --purple:#756276;
+  --blue:#59758a;
+  --shadow:0 14px 36px rgba(63,52,39,.10);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:"Noto Serif SC","Songti SC","STSong","Source Han Serif SC","Microsoft YaHei",serif;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 12% 5%, rgba(95,123,115,.10), transparent 26%),
+    radial-gradient(circle at 88% 12%, rgba(176,138,79,.08), transparent 23%),
+    linear-gradient(180deg,#f7f4ee 0%,var(--paper) 55%,#efe9df 100%);
+  line-height:1.78;
+}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1240px;margin:0 auto;padding:0 24px 80px}
+.hero{
+  padding:74px 0 44px;
+  border-bottom:1px solid var(--line);
+  position:relative;
+}
+.kicker{
+  display:inline-flex;gap:10px;align-items:center;
+  font-size:13px;letter-spacing:.12em;color:var(--qing);
+  border:1px solid rgba(95,123,115,.35);padding:7px 12px;border-radius:999px;
+  background:rgba(255,255,255,.35)
+}
+.hero h1{
+  margin:18px 0 12px;font-size:clamp(34px,5vw,64px);line-height:1.12;
+  letter-spacing:-.03em;font-weight:700;color:#2b2b2a;
+}
+.hero h1 span{color:var(--dai)}
+.subtitle{font-size:19px;color:var(--muted);max-width:920px}
+.meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:24px}
+.meta span{
+  padding:7px 11px;border-radius:8px;background:rgba(255,255,255,.52);
+  border:1px solid var(--line);font-size:13px;color:#5e5953
+}
+.thesis{
+  margin-top:30px;padding:22px 24px;border-left:4px solid var(--zhu);
+  background:linear-gradient(90deg,rgba(166,90,75,.08),rgba(255,255,255,.18));
+  font-size:19px
+}
+.layout{display:grid;grid-template-columns:240px minmax(0,1fr);gap:34px;margin-top:34px}
+aside{
+  position:sticky;top:18px;align-self:start;
+  background:rgba(251,248,241,.72);backdrop-filter:blur(8px);
+  border:1px solid var(--line);border-radius:18px;padding:18px;
+  box-shadow:var(--shadow)
+}
+aside b{display:block;margin-bottom:10px;color:var(--dai)}
+aside a{display:block;padding:7px 8px;border-radius:8px;font-size:14px;color:#58534d}
+aside a:hover{background:#ece6dc;text-decoration:none;color:var(--zhu)}
+main{min-width:0}
+section{padding:26px 0 18px;scroll-margin-top:20px}
+h2{font-size:28px;margin:0 0 16px;color:#33312f}
+h2 .n{font-size:14px;color:var(--zhu);letter-spacing:.08em;margin-right:8px}
+h3{font-size:20px;margin:24px 0 10px;color:var(--dai)}
+p{margin:10px 0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.card{
+  background:rgba(251,248,241,.86);border:1px solid var(--line);
+  border-radius:16px;padding:19px 20px;box-shadow:0 8px 24px rgba(80,66,50,.06)
+}
+.card h3{margin-top:0}
+.note{font-size:14px;color:var(--muted)}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;border:1px solid currentColor;margin-right:6px}
+.b1{color:var(--qing)} .b2{color:var(--zhu)} .b3{color:var(--gold)} .b4{color:var(--purple)} .b5{color:var(--blue)}
+table{width:100%;border-collapse:collapse;background:rgba(251,248,241,.84);border-radius:14px;overflow:hidden}
+th,td{padding:13px 14px;border-bottom:1px solid var(--line);vertical-align:top;text-align:left}
+th{background:#e9e2d6;color:#4a4640;font-weight:700}
+tr:last-child td{border-bottom:none}
+.callout{
+  padding:20px 22px;border:1px solid rgba(89,117,138,.25);border-radius:15px;
+  background:rgba(89,117,138,.06);margin:16px 0
+}
+.quote{
+  font-size:21px;line-height:1.65;padding:22px 24px;
+  border-left:4px solid var(--gold);background:rgba(176,138,79,.07);
+  color:#45413c
+}
+.seven{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin:18px 0}
+.seven button{
+  border:1px solid var(--line);background:#faf7f0;border-radius:12px;padding:13px 6px;
+  cursor:pointer;font-family:inherit;color:#514d48;transition:.2s
+}
+.seven button:hover,.seven button.active{transform:translateY(-2px);background:#e9e2d6;color:var(--zhu);border-color:#c8baa6}
+.panel{
+  display:none;border:1px solid var(--line);background:rgba(251,248,241,.9);
+  padding:20px 22px;border-radius:16px
+}
+.panel.active{display:block}
+.systems{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.sys{padding:15px 16px;border-left:4px solid var(--qing);background:rgba(255,255,255,.36);border-radius:10px}
+.sys strong{display:block}
+.timeline{position:relative;margin:22px 0 6px;padding-left:28px}
+.timeline:before{content:"";position:absolute;left:8px;top:3px;bottom:3px;width:2px;background:var(--line)}
+.t{position:relative;margin:16px 0}
+.t:before{content:"";position:absolute;left:-24px;top:9px;width:10px;height:10px;border-radius:50%;background:var(--zhu);box-shadow:0 0 0 4px #f2ece3}
+.axis{margin:12px 0}
+.axis-head{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.axis-bar{height:9px;border-radius:999px;background:#ded6ca;overflow:hidden;margin-top:6px}
+.axis-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--qing),var(--gold),var(--zhu));border-radius:999px}
+.patterns{display:flex;flex-wrap:wrap;gap:8px}
+.patterns span{padding:7px 10px;background:#eee7dc;border:1px solid #d9cebe;border-radius:999px;font-size:13px}
+.contrast{
+  display:grid;grid-template-columns:1fr 70px 1fr;align-items:stretch;gap:10px
+}
+.contrast .mid{display:flex;align-items:center;justify-content:center;color:var(--zhu);font-weight:700}
+.small{font-size:13px;color:var(--muted)}
+footer{margin-top:38px;padding-top:24px;border-top:1px solid var(--line);font-size:13px;color:var(--muted)}
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  aside{position:relative;top:auto}
+  .grid,.grid3,.systems{grid-template-columns:1fr}
+  .seven{grid-template-columns:repeat(2,1fr)}
+  .contrast{grid-template-columns:1fr}.contrast .mid{padding:4px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="kicker">PAPER READING · SOURCE-CODE STUDY</div>
+    <h1><span>Harness Engineering</span><br/>11 个 Coding Agent 的源码解剖</h1>
+    <p class="subtitle">《Harness Engineering: Anatomy, Architecture, and Evolution of Coding Agents — A Source-Code Study of Eleven Systems》精读笔记。重点不是“再讲一遍 Harness 是什么”，而是理解作者如何从真实生产源码中抽取结构、模式与演化趋势。</p>
+    <div class="meta">
+      <span>Paul Barbaste · Tristan Darrigol · Germain Vu · Tom Wiltberger</span>
+      <span>arXiv:2609.00006</span>
+      <span>83 pages · 7 figures · 18 tables</span>
+      <span>11 harnesses + 1 meta-harness</span>
+      <span>≈ 4M lines of source code</span>
+    </div>
+    <div class="thesis"><b>全文主论点：</b>到 2026 年上半年，Coding Agent Harness 已经完成了从“工具”到“平台”的转变。它不再只是一个调用模型的 CLI，而正在变成带有扩展生态、治理、市场、SDK、跨 Harness 协议与宿主能力的平台层。</div>
+  </header>
+
+  <div class="layout">
+    <aside>
+      <b>精读导航</b>
+      <a href="#position">01 这篇论文在研究什么</a>
+      <a href="#method">02 研究方法</a>
+      <a href="#seven">03 七个 Canonical Subsystems</a>
+      <a href="#systems">04 11 个系统怎么看</a>
+      <a href="#patterns">05 29 个设计模式</a>
+      <a href="#absences">06 两个“缺席”</a>
+      <a href="#skills">07 Skills / MCP / ACP</a>
+      <a href="#platform">08 Platform Turn</a>
+      <a href="#minimal">09 Minimalism 与复杂度</a>
+      <a href="#codesign">10 Model–Harness Co-design</a>
+      <a href="#limits">11 论文局限</a>
+      <a href="#compare">12 与上一篇 Survey 的区别</a>
+      <a href="#takeaways">13 最终理解</a>
+    </aside>
+
+    <main>
+      <section id="position">
+        <h2><span class="n">01</span>这篇论文到底在研究什么？</h2>
+        <p>作者先提出一个极其直接的定义：<b>Agent = Model + Harness</b>。模型提供“智能”，Harness 则负责把这种智能变成真实世界中的持续行动：循环、工具、上下文、安全、编排和扩展接口。</p>
+        <div class="quote">这篇论文的真正贡献，不是再给 Harness 下一个定义，而是第一次大规模地问：<b>生产环境中的 Harness 到底是怎么写出来的？</b></div>
+        <div class="grid3">
+          <div class="card"><span class="badge b1">不是 Benchmark</span><h3>不比较谁分高</h3><p>作者明确说：本文“不 benchmark、不排名”。它关心的是架构，而不是 SWE-Bench 排名。</p></div>
+          <div class="card"><span class="badge b2">源码实证</span><h3>直接读生产代码</h3><p>研究对象覆盖约 400 万行 Python、TypeScript、Rust 源码，重点观察 loop、tool、memory、permission 等真实实现。</p></div>
+          <div class="card"><span class="badge b3">纵向演化</span><h3>还看 90 天怎么变</h3><p>原先 8 个系统在 4 月已经分析过，7 月再次固定版本并做源码 diff，因此可以观察模式如何扩散、模仿和迁移。</p></div>
+        </div>
+        <div class="callout"><b>阅读关键词：</b>这不是“Agent 算法论文”，更接近一篇 <b>software architecture empirical study</b>。它想做的是 Harness 领域的“reference anatomy”。</div>
+      </section>
+
+      <section id="method">
+        <h2><span class="n">02</span>研究方法：为什么这篇比普通综述更“实”</h2>
+        <p>作者选择 11 个 Harness，刻意覆盖三条轴线：<b>设计哲学、成熟度、市场位置</b>。同时加入 Omnigent 作为 meta-harness 对照。</p>
+        <table>
+          <tr><th>类型</th><th>代表系统</th><th>作者为什么选</th></tr>
+          <tr><td>Provider-native</td><td>Claude Code / Codex CLI / Gemini CLI / Mistral Vibe</td><td>分别代表 Anthropic、OpenAI、Google、Mistral 的一线生产 Harness</td></tr>
+          <tr><td>成熟开源</td><td>OpenHands / Aider</td><td>模块化平台、编辑策略等已有明显技术路线</td></tr>
+          <tr><td>极简基线</td><td>Mini-SWE-Agent</td><td>用约 100 行代码证明 Harness 的“最低结构地板”很低</td></tr>
+          <tr><td>新型开源</td><td>Hermes / Pi / OpenCode</td><td>分别代表自进化 Skill、minimal-core、client/server 平台化</td></tr>
+          <tr><td>非 SWE 对照</td><td>OpenClaw</td><td>用于观察 Harness 思想是否超出纯 Coding Agent</td></tr>
+          <tr><td>Meta-Harness</td><td>Omnigent</td><td>不自己做编辑 loop，而是把多个 Harness 当可替换后端调度</td></tr>
+        </table>
+        <p class="note">论文特别强调版本固定（pinned releases / commits），因为 Harness 在 2026 年的演化速度极快，很多“库存事实”几个月就可能失效。</p>
+      </section>
+
+      <section id="seven">
+        <h2><span class="n">03</span>七个 Canonical Subsystems</h2>
+        <p>这篇论文的七层和上一篇 ETCLOVG 不完全相同。它更偏 Coding Harness 的“内部器官”，围绕实际源码结构来拆。</p>
+        <div class="seven">
+          <button class="active" data-p="p1">Agent Loop</button>
+          <button data-p="p2">LLM Integration</button>
+          <button data-p="p3">Tools</button>
+          <button data-p="p4">Memory</button>
+          <button data-p="p5">Safety</button>
+          <button data-p="p6">Orchestration</button>
+          <button data-p="p7">Extensibility</button>
+        </div>
+        <div id="p1" class="panel active"><h3>1. Agent Loop</h3><p>负责“推理 → 行动 → 观察 → 再推理”的主循环，也拥有停止条件、错误恢复、并发执行等控制。最小形态是 Mini-SWE-Agent 的线性 while；最大形态可到 OpenHands 的 event-sourced conversation engine。</p></div>
+        <div id="p2" class="panel"><h3>2. LLM Integration</h3><p>不仅是“调 API”。它还包括 provider protocol、prompt assembly、cache、thinking、routing、model-family differentiation。论文强调：生产 Harness 正在越来越深地与模型族共设计。</p></div>
+        <div id="p3" class="panel"><h3>3. Tools & Actions</h3><p>决定 Agent 能做什么，尤其是读写文件、命令执行和编辑。论文观察到工具数从 bash-only 到数十个 typed tools；当工具过多时，deferred loading 开始成为重要模式。</p></div>
+        <div id="p4" class="panel"><h3>4. Memory & Context</h3><p>核心任务是“如何花掉上下文窗口”。包括线性 history、summary/compaction、跨会话 memory、层级 Markdown context、JIT retrieval 等。</p></div>
+        <div id="p5" class="panel"><h3>5. Safety & Permissions</h3><p>决定什么可以直接执行、什么要询问用户、什么必须禁止。系统之间分歧极大：从只有 step/cost limit，到 policy-as-code + LLM reviewer + OS sandbox。</p></div>
+        <div id="p6" class="panel"><h3>6. Orchestration</h3><p>负责 sub-agent spawn、context fork、worker coordination 和跨 agent 连接。作者特别指出：生产系统的多 Agent 往往更多用于“并行探索”，而不是并行写代码。</p></div>
+        <div id="p7" class="panel"><h3>7. Extensibility</h3><p>用户如何把能力装进 Harness：config、hooks、skills、plugins、MCP、ACP。2026 年最显著变化之一，就是这一层从“辅助功能”变成平台化的核心。</p></div>
+        <div class="callout">论文还指出两条跨层 surface：<b>Interface layer</b>（CLI/TUI/IDE/HTTP/SDK）与 <b>Session substrate</b>（resume/fork/transcript/persistence）。它们不被单独算作七层，但会穿透多个 subsystem。</div>
+      </section>
+
+      <section id="systems">
+        <h2><span class="n">04</span>11 个系统：不要逐个背，而要看“设计立场”</h2>
+        <div class="systems">
+          <div class="sys"><strong>Claude Code</strong>强 provider coupling；大量 typed tools；递归 sub-agent；Skills/MCP/hooks；缓存边界和权限体系都很成熟。</div>
+          <div class="sys"><strong>Codex CLI</strong>Rust 大型工程；模型目录由服务端下发；多层 permission + native sandbox；更像一套可持续升级的平台 runtime。</div>
+          <div class="sys"><strong>Gemini CLI</strong>异步生成器 loop；分层 memory；跨平台 sandbox；同时支持 A2A，协议化程度高。</div>
+          <div class="sys"><strong>Mistral Vibe</strong>middleware-pipeline 很有代表性；provider-first + generic fallback；权限 scope 与 hooks 结构清晰。</div>
+          <div class="sys"><strong>OpenHands</strong>event-sourced；conversation tree；外层 judge；还能把 rival harness 当 backend host。</div>
+          <div class="sys"><strong>Aider</strong>单 Agent、编辑策略丰富；保留“工具简洁但 edit contract 深”的老派路线。</div>
+          <div class="sys"><strong>Mini-SWE-Agent</strong>证明“把事做完”的最低 Harness 很小：简单 loop + bash + history + limits。</div>
+          <div class="sys"><strong>Hermes</strong>Skill 自生成、自修正、跨会话 memory、swarm，是“自进化 Harness”方向的代表。</div>
+          <div class="sys"><strong>Pi</strong>极小 core + 极强 extension host，把很多能力搬到 event bus 上，是“minimal core”极端路线。</div>
+          <div class="sys"><strong>OpenCode</strong>强 client/server 架构，HTTP/OpenAPI/SDK，多 UI 都只是客户端，平台化最直观。</div>
+          <div class="sys"><strong>OpenClaw</strong>多渠道 gateway，证明 Harness 思路已扩展到非纯软件工程场景。</div>
+          <div class="sys"><strong>Omnigent（对照）</strong>不是 Harness，而是 meta-harness：把 Claude Code、Codex 等当成 interchangeable components。</div>
+        </div>
+      </section>
+
+      <section id="patterns">
+        <h2><span class="n">05</span>29 个设计模式：论文真正“值钱”的部分</h2>
+        <p>作者不是只列 feature，而是把跨系统反复出现的结构抽象为 recurring patterns。下面这些尤其值得理解：</p>
+        <div class="patterns">
+          <span>Reflection Loop</span><span>Prompt Caching</span><span>Context Forking</span><span>Middleware Pipeline</span>
+          <span>JIT Repo Context</span><span>SKILL.md Capability Bundles</span><span>Conditional Activation</span>
+          <span>Turn-Level Checkpoint</span><span>Agent-Maintained Memory</span><span>Outer Verification Loop</span>
+          <span>Self-Improving Skill Loop</span><span>Lineage Compaction</span><span>Session-Tree Version Control</span>
+          <span>Minimal-Core / Extension-Host</span><span>Client/Server Harness</span><span>Model-Family Prompt Matrix</span>
+          <span>Cache-Dialect Fanout</span><span>Syntax-Aware Permissioning</span><span>Untrusted-Content Delimiting</span>
+          <span>Harness Mimicry</span>
+        </div>
+        <h3>怎么理解这些 pattern？</h3>
+        <p>不要把它们当成“29 个名词”。它们描述的是：当 Agent 从 Demo 走向长期运行，工程问题会重复出现，而不同团队会独立收敛到相似结构。比如：</p>
+        <div class="grid">
+          <div class="card"><h3>Context Forking</h3><p>sub-agent 不应该直接污染主 Agent 的完整上下文，因此会克隆父状态、形成隔离分支，再返回摘要或结果。</p></div>
+          <div class="card"><h3>Outer Verification Loop</h3><p>仅靠 Agent 自己说“完成了”不可靠，于是 Harness 在主 loop 之外再加 judge / stop guard，对终止条件进行二次验证。</p></div>
+          <div class="card"><h3>Lineage Compaction</h3><p>压缩不再只是“把旧对话总结一下”，而是保留 session ancestry，让压缩后的上下文仍可追溯前序状态。</p></div>
+          <div class="card"><h3>Client/Server Harness</h3><p>Agent runtime 变成服务端，TUI、Web、IDE、CI 都只是 client。这是“工具 → 平台”的直接证据。</p></div>
+        </div>
+      </section>
+
+      <section id="absences">
+        <h2><span class="n">06</span>论文最出圈的发现：两个“缺席”</h2>
+        <div class="grid">
+          <div class="card">
+            <span class="badge b2">0 / 11</span>
+            <h3>没有通用 Agent Framework</h3>
+            <p>作者检查 LangChain、LangGraph、AutoGen、CrewAI、Pydantic AI、Semantic Kernel、Google ADK 等大量依赖，在生产 Agent runtime 的主路径中全部缺席。</p>
+            <p><b>实际情况：</b>大家普遍使用宿主语言原生的 async primitives 手写 loop，再用 Pydantic / Zod / Rust enum 等自建 tool schema。</p>
+          </div>
+          <div class="card">
+            <span class="badge b3">0 / 11</span>
+            <h3>没有对代码仓库做 Vector RAG</h3>
+            <p>代码检索几乎全靠 ripgrep、glob、tree-sitter、LSP、文件路径和自动发现的 Markdown context。</p>
+            <p><b>原因：</b>代码结构信息确定性强、变化快；预构建 embedding 很容易过期，且额外引入索引维护成本。</p>
+          </div>
+        </div>
+        <div class="callout"><b>必须精确理解：</b>论文并不是说“RAG 没用”，而是说 <b>vector-embedding RAG 没被这些生产 Coding Agent 用来检索源码</b>。OpenClaw 等系统依然可能对“对话记忆”使用 embedding/hybrid retrieval。</div>
+        <p>作者由此提出一个很有意思的判断：<b>生产 Coding Harness 与通用 LLM Application 的复杂度预算不同。</b>当系统真的要修改代码时，可调试性、prompt transparency 和结构确定性，往往比抽象复用更重要。</p>
+      </section>
+
+      <section id="skills">
+        <h2><span class="n">07</span>Skills、MCP、ACP：论文观察到的协议与扩展趋势</h2>
+        <div class="grid3">
+          <div class="card"><span class="badge b1">9 / 11</span><h3>SKILL.md</h3><p>Skills 的采用率已经超过 MCP。作者把 Skill 看成“面向 LLM runtime 的 declarative program”：自然语言主体 + YAML metadata + 可选脚本。</p></div>
+          <div class="card"><span class="badge b4">8 / 11</span><h3>MCP</h3><p>MCP 已成为跨系统外部能力扩展的重要标准，但在这批 Harness 里，Skills 的覆盖面更高。</p></div>
+          <div class="card"><span class="badge b5">6 systems</span><h3>ACP</h3><p>ACP 不再只承担“IDE ↔ Agent”角色，还出现了第二种用途：把一个 Harness 当成另一个 Harness 的可替换 backend。</p></div>
+        </div>
+        <h3>ACP 的三个角色</h3>
+        <table>
+          <tr><th>角色</th><th>含义</th></tr>
+          <tr><td>Editor ↔ Agent</td><td>像 LSP 一样，让 IDE 通过协议驱动本地 Agent。</td></tr>
+          <tr><td>Agent-as-backend</td><td>OpenHands 等系统把 Claude Code / Codex / Gemini CLI 作为后端宿主。</td></tr>
+          <tr><td>Cross-vendor mesh</td><td>A2A 一类协议把不同 vendor 的 Agent 放进更大的 multi-agent topology。</td></tr>
+        </table>
+        <p class="note">非常关键的一点：Harness 内部自己的 sub-agent 通信，很多仍然是 in-process queue / function call / local session，并没有因为 ACP/A2A 出现就全部协议化。</p>
+      </section>
+
+      <section id="platform">
+        <h2><span class="n">08</span>Platform Turn：为什么作者说 Harness 已经不是“工具”</h2>
+        <p>作者的核心 thesis 是：2025 → 2026 年中，Harness 完成了从 CLI 工具到平台的转向。依据不是抽象判断，而是四个“平台信号”。</p>
+        <div class="timeline">
+          <div class="t"><h3>Signal 1 · Skills = Declarative Programs</h3><p>Skill 有目录、说明、触发条件、权限和注册表，越来越像传统平台中的 package/plugin。</p></div>
+          <div class="t"><h3>Signal 2 · Hooks / Event Bus = Extension Substrate</h3><p>原本只在少数系统出现的生命周期 hook，到 7 月已经成为 9/11 系统的主流扩展方式。</p></div>
+          <div class="t"><h3>Signal 3 · Tool 与 Workflow 的边界消失</h3><p>Agent 不只是调用某个工具，而是接管“读代码 → 改代码 → 测试 → 提交 → 复核”的整段开发流程。</p></div>
+          <div class="t"><h3>Signal 4 · Harness 变成 Service Surface</h3><p>HTTP server、OpenAPI、SDK、Hosted Runtime、Managed Agents API 出现后，Harness 已经具备典型平台分发形态。</p></div>
+        </div>
+        <div class="quote">作者给出的第二种解释非常重要：<b>生产 Harness 不使用 Agent Framework，不一定是因为它们“不需要框架”，而可能是因为 Harness 自己已经变成了框架。</b></div>
+      </section>
+
+      <section id="minimal">
+        <h2><span class="n">09</span>Minimalism Argument：100 行为什么也能打？</h2>
+        <p>Mini-SWE-Agent 只有极小的 scaffold，却能报告与大型系统接近区间的 SWE-Bench Verified 表现。作者由此区分了两个问题：</p>
+        <div class="contrast">
+          <div class="card"><h3>“能不能完成任务”</h3><p>Frontier model + 简单 loop + bash / file tools，很多情况下已经够。</p></div>
+          <div class="mid">≠</div>
+          <div class="card"><h3>“能不能成为生产产品”</h3><p>真正让代码量膨胀的是 safety、UX、recovery、cost control、extensions、clients、SDK、enterprise governance。</p></div>
+        </div>
+        <h3>Scaffold–Capability Frontier</h3>
+        <p>作者提出一个<b>尚未证明的指导性假说</b>：对固定任务和固定模型，scaffold complexity 与 task success 可能是近似“先陡升、后平台”的凹曲线。</p>
+        <div class="axis">
+          <div class="axis-head"><span>没有 loop/tool：无法工作</span><span>少量结构：快速增益</span><span>复杂生产结构：收益转向安全/UX/可扩展</span></div>
+          <div class="axis-bar"><i style="width:86%"></i></div>
+        </div>
+        <div class="callout">因此，生产 Harness 的复杂度不能只用 benchmark completion rate 来解释。很多工程投入根本不是为了让模型“更聪明”，而是为了让系统“更可用、更安全、更稳定”。</div>
+      </section>
+
+      <section id="codesign">
+        <h2><span class="n">10</span>Model–Harness Co-design：模型和 Harness 是双向塑形</h2>
+        <div class="grid">
+          <div class="card"><h3>Model shapes Harness</h3><p>不同模型的 reasoning mode、tool-call behavior、edit reliability、cache semantics 不同，因此 prompt、tool contract、routing 与 context policy 会随模型族变化。</p></div>
+          <div class="card"><h3>Harness shapes Model Usage</h3><p>deferred tool loading、prompt cache boundary、compaction、thought stripping、provider routing 会改变模型实际看到的上下文、成本与行为。</p></div>
+        </div>
+        <p>这也是为什么 provider-native Harness 有天然优势：它们可以在模型版本更新当天，同时修改模型侧和 Harness 侧。多 Provider Harness 并非做不到优化，但需要自己维护 per-provider conditional layer。</p>
+      </section>
+
+      <section id="limits">
+        <h2><span class="n">11</span>论文局限：哪些结论不能过度解释</h2>
+        <div class="grid">
+          <div class="card"><h3>只读源码，不跑统一实验</h3><p>作者知道系统“怎么组织”，但不知道统一任务下谁更快、谁更稳定。Benchmark 数字大多来自项目自报。</p></div>
+          <div class="card"><h3>定性比较仍有主观性</h3><p>架构评分、模式归类包含研究者判断；虽然作者尽量用代码细节锚定，但不是完全客观指标。</p></div>
+          <div class="card"><h3>Claude Code 可复现性较弱</h3><p>它依赖一个公开流传的 2026 年 3 月源码 snapshot，并非官方完整开源 release，因此这一部分证据最弱。</p></div>
+          <div class="card"><h3>“不存在”结论也不是数学证明</h3><p>Framework absence 是基于 manifest/import grep；仍不可能绝对排除动态加载、内部 fork 或未观察到的路径。</p></div>
+        </div>
+        <div class="callout">所以这篇论文最适合支持的是：<b>“截至作者固定的 2026 年 7 月版本，这 11 个系统的源码结构呈现出这些模式。”</b> 不宜扩展成“所有 Agent 都应该这样做”。</div>
+      </section>
+
+      <section id="compare">
+        <h2><span class="n">12</span>它和上一篇《Agent Harness Engineering: A Survey》到底有什么区别？</h2>
+        <table>
+          <tr><th></th><th>上一篇 Survey</th><th>这一篇源码研究</th></tr>
+          <tr><td>研究目标</td><td>建立 Harness Engineering 的总体知识地图</td><td>解释真实 Coding Harness 到底如何实现</td></tr>
+          <tr><td>分析对象</td><td>170+ 开源项目生态</td><td>11 个具体生产 Harness + 1 Meta-Harness</td></tr>
+          <tr><td>核心框架</td><td>ETCLOVG：Execution / Tooling / Context / Lifecycle / Observability / Verification / Governance</td><td>Loop / LLM Integration / Tools / Memory / Safety / Orchestration / Extensibility</td></tr>
+          <tr><td>证据类型</td><td>综述、项目分类、生态梳理</td><td>源码审计、版本固定、90 天纵向 diff</td></tr>
+          <tr><td>最重要贡献</td><td>告诉你 Harness Engineering 的“全景结构”</td><td>告诉你一线产品真实“怎么长出来”</td></tr>
+          <tr><td>独特结论</td><td>Harness 是生产 Agent 的完整工程层</td><td>无通用框架、无代码向量 RAG；Skills/MCP/ACP 扩张；Harness 正平台化</td></tr>
+        </table>
+        <p><b>一句话关系：</b>第一篇像“地图册”，这一篇像“建筑解剖图 + 城市实地调查”。两篇不是替代关系，而是理论 taxonomy 与源码 empirical evidence 的互补。</p>
+      </section>
+
+      <section id="takeaways">
+        <h2><span class="n">13</span>读完这篇后，真正应该留下的 8 个认知</h2>
+        <div class="grid">
+          <div class="card"><h3>① Harness 是 Runtime，不只是 Prompt Wrapper</h3><p>真正的差异来自 loop、context、tool、安全、session 和 extension 的组合。</p></div>
+          <div class="card"><h3>② 复杂 Loop ≠ 更高 Benchmark</h3><p>Loop sophistication 更像 production readiness 的信号，而不是 task success 的直接预测器。</p></div>
+          <div class="card"><h3>③ 生产 Coding Agent 偏爱 JIT Retrieval</h3><p>代码检索依赖文件系统结构、ripgrep、tree-sitter、LSP，而不是预索引 vector RAG。</p></div>
+          <div class="card"><h3>④ Framework Absence 是重要事实</h3><p>这批产品普遍手写 native loop，但长期趋势又是 Harness 和 Framework 重新合并。</p></div>
+          <div class="card"><h3>⑤ Skills 正在变成“Agent 软件包”</h3><p>SKILL.md 不只是提示词文件，而正在具备 program/package 的结构属性。</p></div>
+          <div class="card"><h3>⑥ Safety 是架构问题</h3><p>从 prompt 里写“不要执行危险命令”远远不够，生产系统把安全下沉到 permission / policy / sandbox。</p></div>
+          <div class="card"><h3>⑦ Model 与 Harness 必须共同演化</h3><p>Harness 需要针对模型能力变化持续调整，而不是写完一次永久稳定。</p></div>
+          <div class="card"><h3>⑧ Harness 正在平台化</h3><p>SDK、hooks、marketplace、host、session import、meta-harness 的出现，说明类别边界已经发生变化。</p></div>
+        </div>
+      </section>
+
+      <section>
+        <h2>论文原文</h2>
+        <p>官方 arXiv：<a href="https://arxiv.org/abs/2609.00006" target="_blank">https://arxiv.org/abs/2609.00006</a></p>
+        <p>官方 HTML：<a href="https://arxiv.org/html/2609.00006" target="_blank">https://arxiv.org/html/2609.00006</a></p>
+        <p>官方 PDF：<a href="https://arxiv.org/pdf/2609.00006" target="_blank">https://arxiv.org/pdf/2609.00006</a></p>
+      </section>
+    </main>
+  </div>
+
+  <footer>
+    本页为学习型解读，不替代论文原文。结论以 arXiv v1（2026-07）公开文本为依据；涉及系统采用率、版本、代码规模等“库存事实”应结合论文固定时间点理解。
+  </footer>
+</div>
+
+<script>
+document.querySelectorAll('.seven button').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.seven button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.p).classList.add('active');
+  });
+});
+</script>
+</body>
+</html>

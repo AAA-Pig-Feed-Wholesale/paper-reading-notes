@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="论文、技术文章与研究资料的阅读笔记。">
+  <title>论文阅读笔记</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #172033;
+      --muted: #687386;
+      --accent: #315efb;
+      --border: #e4e8f0;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1420;
+        --card: #171e2d;
+        --text: #edf1f8;
+        --muted: #a4aec0;
+        --accent: #86a5ff;
+        --border: #2a3447;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+      line-height: 1.7;
+    }
+    main { width: min(900px, calc(100% - 32px)); margin: 0 auto; padding: 72px 0; }
+    header { margin-bottom: 40px; }
+    h1 { margin: 0 0 12px; font-size: clamp(2rem, 7vw, 3.6rem); letter-spacing: -0.04em; }
+    header p { margin: 0; color: var(--muted); font-size: 1.05rem; }
+    .notes { display: grid; gap: 16px; }
+    article {
+      padding: 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      transition: transform 160ms ease, border-color 160ms ease;
+    }
+    article:hover { transform: translateY(-2px); border-color: var(--accent); }
+    h2 { margin: 0 0 8px; font-size: 1.25rem; line-height: 1.45; }
+    a { color: inherit; text-decoration: none; }
+    article p { margin: 0; color: var(--muted); }
+    .tag { color: var(--accent); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.04em; }
+    footer { margin-top: 40px; color: var(--muted); font-size: 0.9rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <h1>论文阅读笔记</h1>
+      <p>记录论文、技术文章与研究资料中的关键观点和个人理解。</p>
+    </header>
+
+    <section class="notes" aria-label="文章列表">
+      <article>
+        <div class="tag">论文精读</div>
+        <h2><a href="./agent_harness_survey_learning_v4.html">Agent Harness Engineering: A Survey｜论文精读与解读</a></h2>
+        <p>Agent Harness Engineering 综述学习笔记。</p>
+      </article>
+
+      <article>
+        <div class="tag">源码研究</div>
+        <h2><a href="./harness_engineering_coding_agents_source_study.html">Harness Engineering：11 个 Coding Agent 源码解剖</a></h2>
+        <p>从源码视角梳理 Coding Agent 的 Harness Engineering。</p>
+      </article>
+
+      <article>
+        <div class="tag">工业实践</div>
+        <h2><a href="./agent_harness_industry_openai_langchain_anthropic.html">Agent Harness 工业实践三篇精读｜OpenAI × LangChain × Anthropic</a></h2>
+        <p>对三种 Agent Harness 工业实践路径的阅读与整理。</p>
+      </article>
+    </section>
+
+    <footer>持续更新中</footer>
+  </main>
+</body>
+</html>

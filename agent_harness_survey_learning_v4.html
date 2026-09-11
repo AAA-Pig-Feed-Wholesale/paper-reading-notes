@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Agent Harness Engineering: A Survey｜论文精读与解读</title>
+<style>
+:root{
+  /* 中国传统色灵感：墨色、黛青、青黛、月白、秋香、藕荷 */
+  --bg:#111417;
+  --bg2:#171b1f;
+  --panel:#1b2024;
+  --panel2:#20262b;
+  --panel3:#15191c;
+  --text:#f3f0e8;
+  --text-soft:#ded9cf;
+  --muted:#aaa69d;
+  --line:#343b3f;
+  --line-soft:#293034;
+  --accent:#789262;        /* 竹青 */
+  --accent-strong:#9bb07f;
+  --cyan:#5f8f94;          /* 黛青 */
+  --indigo:#6c7c99;        /* 青黛 */
+  --gold:#c4a75d;          /* 秋香 */
+  --rose:#b7837e;          /* 藕荷 */
+  --jade:#7c9b8e;
+  --shadow:0 24px 70px rgba(0,0,0,.34);
+  --shadow-soft:0 12px 32px rgba(0,0,0,.22)
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  color:var(--text);
+  font:15px/1.82 Inter,"PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  letter-spacing:.01em;
+  background:
+    radial-gradient(circle at 14% -8%,rgba(95,143,148,.16),transparent 30%),
+    radial-gradient(circle at 88% 0%,rgba(183,131,126,.10),transparent 24%),
+    radial-gradient(circle at 50% 105%,rgba(120,146,98,.08),transparent 34%),
+    linear-gradient(180deg,#111417 0%,#15191c 44%,#101315 100%);
+}
+body:before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;
+  background-image:
+    linear-gradient(rgba(243,240,232,.018) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(243,240,232,.014) 1px,transparent 1px);
+  background-size:38px 38px;
+  mask-image:linear-gradient(to bottom,black,transparent 75%)
+}
+a{color:#b6c8c6;text-decoration:none;border-bottom:1px solid transparent;transition:.18s}
+a:hover{color:#edf3ef;border-bottom-color:#668b8d}
+.container{max-width:1200px;margin:auto;padding:0 24px}
+.hero{padding:82px 0 50px;border-bottom:1px solid var(--line-soft);position:relative}
+.hero:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(196,167,93,.38),rgba(95,143,148,.28),transparent)}
+.badge{display:inline-flex;padding:7px 12px;border:1px solid #465053;background:rgba(243,240,232,.028);border-radius:999px;color:#d6d0c4;font-size:12px;letter-spacing:.09em;text-transform:uppercase;box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
+h1{font-size:clamp(36px,5vw,62px);line-height:1.06;margin:20px 0 16px;letter-spacing:-1.9px;font-weight:720;background:linear-gradient(135deg,#f4f0e7 0%,#d9dfd7 45%,#a7b9b8 76%,#c6a85e 120%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.subtitle{max-width:940px;color:#c3beb5;font-size:18px;line-height:1.78}
+.meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.meta span{padding:6px 10px;background:rgba(243,240,232,.022);border:1px solid #394145;border-radius:8px;color:#a9a59c;font-size:13px}
+.layout{display:grid;grid-template-columns:255px 1fr;gap:30px;padding:36px 0 86px}
+.toc{position:sticky;top:18px;align-self:start;background:rgba(24,29,32,.88);backdrop-filter:blur(18px) saturate(105%);border:1px solid #394145;border-radius:18px;padding:16px;box-shadow:var(--shadow-soft)}
+.toc:before{content:"";display:block;width:34px;height:2px;margin:0 0 12px;background:linear-gradient(90deg,var(--gold),var(--cyan));border-radius:2px}
+.toc strong{display:block;margin:2px 0 10px;color:#ece7dc;font-size:14px;letter-spacing:.05em}
+.toc a{display:block;padding:6px 9px;border-radius:7px;color:#a29f97;font-size:13.5px;border:0}
+.toc a:hover{background:rgba(95,143,148,.10);color:#f0ece3}
+main section{scroll-margin-top:20px;margin-bottom:26px}
+.card{background:linear-gradient(180deg,rgba(29,35,39,.95),rgba(22,27,30,.97));border:1px solid #363f42;border-radius:20px;padding:27px;box-shadow:var(--shadow-soft);position:relative;overflow:hidden}
+.card:before{content:"";position:absolute;left:0;top:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(196,167,93,.26),rgba(95,143,148,.16),transparent)}
+h2{font-size:27px;margin:0 0 16px;letter-spacing:-.45px;color:#f0ece3;font-weight:690}
+h3{font-size:18px;margin:22px 0 8px;color:#ddd7cc}
+.lead{font-size:18px;color:#ddd8cf}
+.muted{color:var(--muted)}
+.callout{border-left:2px solid var(--cyan);background:linear-gradient(90deg,rgba(95,143,148,.12),rgba(95,143,148,.035));padding:16px 18px;border-radius:0 12px 12px 0;margin:17px 0;color:#dfe3de}
+.callout.green{border-color:var(--accent);background:linear-gradient(90deg,rgba(120,146,98,.12),rgba(120,146,98,.032))}
+.callout.yellow{border-color:var(--gold);background:linear-gradient(90deg,rgba(196,167,93,.12),rgba(196,167,93,.032))}
+.callout.pink{border-color:var(--rose);background:linear-gradient(90deg,rgba(183,131,126,.11),rgba(183,131,126,.03))}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.mini{background:linear-gradient(180deg,#1a2023,#161b1e);border:1px solid #384044;border-radius:15px;padding:18px;box-shadow:inset 0 1px 0 rgba(255,255,255,.018)}
+.mini b{font-size:16px;color:#ebe6dc}
+.timeline{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.phase{border:1px solid #394145;border-radius:16px;padding:18px;background:linear-gradient(180deg,#1a2023,#151a1d)}
+.phase:nth-child(1){box-shadow:inset 0 2px 0 rgba(108,124,153,.38)}
+.phase:nth-child(2){box-shadow:inset 0 2px 0 rgba(95,143,148,.40)}
+.phase:nth-child(3){box-shadow:inset 0 2px 0 rgba(196,167,93,.40)}
+.phase b{display:block;font-size:17px;margin-bottom:5px;color:#ece7dd}
+.taxonomy{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.layer{cursor:pointer;border:1px solid #3b4448;background:linear-gradient(180deg,#1a2023,#151a1d);border-radius:15px;padding:17px;transition:.18s ease;box-shadow:inset 0 1px 0 rgba(255,255,255,.014)}
+.layer:hover{transform:translateY(-2px);border-color:#597176;background:#20272a}
+.layer.active{transform:translateY(-2px);border-color:#6f9295;background:linear-gradient(180deg,rgba(70,101,104,.42),rgba(24,31,33,.98));box-shadow:0 10px 28px rgba(0,0,0,.20),inset 0 1px 0 rgba(255,255,255,.035)}
+.letter{font-size:29px;font-weight:800;color:#9cb7b7;letter-spacing:-.04em}
+.layer:nth-child(2n) .letter{color:#aeb894}.layer:nth-child(3n) .letter{color:#c4aa6a}.layer:nth-child(5n) .letter{color:#b9908b}
+.layer small{color:#8f918b;display:block}
+.detail{margin-top:15px;padding:20px;border-radius:16px;background:#14191c;border:1px solid #3a4347;min-height:142px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.chip{padding:5px 9px;border-radius:999px;background:rgba(95,143,148,.095);color:#bad0ce;font-size:12.5px;border:1px solid #41585a}
+.map{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;background:#121619;border:1px solid #343c40;border-radius:16px;padding:19px;color:#d5d8d2;overflow:auto;box-shadow:inset 0 1px 0 rgba(255,255,255,.018)}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{border-bottom:1px solid #323a3d;text-align:left;padding:12px 10px;vertical-align:top}
+th{color:#b8b4aa;font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-weight:650}
+td:first-child{font-weight:680;color:#ece6da}
+.reading{counter-reset:item}.reading li{margin:9px 0;color:#beb9b0}.reading li::marker{color:#88a7a8;font-weight:700}
+.qa{border-top:1px solid #333b3f}
+details{border-bottom:1px solid #333b3f;padding:5px 0}
+summary{cursor:pointer;padding:13px 0;font-weight:680;color:#e4dfd5}
+details p{color:#b9b5ac;margin:0 0 15px}
+.source{word-break:break-all}
+.footer{color:#7f817b;padding:30px 0 50px;border-top:1px solid #2a3134;font-size:12.5px}
+::selection{background:#8fa8a7;color:#101315}
+@media(max-width:950px){.layout{grid-template-columns:1fr}.toc{position:relative;top:0}.taxonomy{grid-template-columns:repeat(2,1fr)}.grid3,.timeline{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
+@media(max-width:600px){.taxonomy{grid-template-columns:1fr}.hero{padding-top:50px}.card{padding:20px}}
+</style>
+</head>
+<body>
+<header class="hero"><div class="container">
+<span class="badge">论文精读 · Article Interpretation</span>
+<h1>Agent Harness Engineering: A Survey</h1>
+<p class="subtitle">这是一份以“读懂论文本身”为目标的中文精读页：从问题意识、概念边界、研究方法，到 ETCLOVG 七层框架、跨层权衡、开源生态观察与论文局限，尽量还原作者真正想建立的 Harness Engineering 研究地图。</p>
+<div class="meta"><span>类型：Survey</span><span>状态：TMLR under review</span><span>核心框架：ETCLOVG</span><span>覆盖：170+ 开源项目</span><span>重点：论文理解，而非面试背诵</span></div>
+</div></header>
+<div class="container layout">
+<nav class="toc"><strong>阅读目录</strong>
+<a href="#overview">01 一句话读懂这篇论文</a>
+<a href="#question">02 作者为什么写它</a>
+<a href="#definition">03 Harness 到底是什么</a>
+<a href="#evolution">04 Prompt→Context→Harness</a>
+<a href="#method">05 Survey 是怎么做的</a>
+<a href="#taxonomy">06 ETCLOVG 七层精读</a>
+<a href="#relations">07 七层如何协作</a>
+<a href="#control">08 Structural Core / Control Plane</a>
+<a href="#tradeoffs">09 三类跨层权衡</a>
+<a href="#ecosystem">10 170+ 项目说明了什么</a>
+<a href="#insights">11 论文真正的新意</a>
+<a href="#limits">12 局限与保留意见</a>
+<a href="#reading">13 建议怎么读原文</a>
+<a href="#notes">14 一页论文笔记</a>
+<a href="#sources">原文入口</a>
+</nav>
+<main>
+<section id="overview" class="card"><h2>01｜一句话读懂这篇论文</h2>
+<p class="lead">这篇论文试图把“模型外面那些决定 Agent 能不能可靠工作起来的工程系统”正式抽象成一个独立研究对象：<b>Agent Harness Engineering</b>。</p>
+<div class="callout"><b>核心判断：</b>当基础模型能力不断增强后，真实 Agent 系统的瓶颈不再只来自模型本身；执行环境、工具接入、上下文管理、生命周期、可观测、验证与治理这些外围机制，会越来越直接决定 Agent 的可靠性、成本、安全性和可维护性。</div>
+<p>因此，作者不是再提出一个新的 Agent framework，而是想建立一张<b>“分析 Harness 的统一地图”</b>。ETCLOVG 七层就是这张地图。</p></section>
+
+<section id="question" class="card"><h2>02｜作者为什么要写这篇 Survey？</h2>
+<div class="grid3">
+<div class="mini"><b>问题 1：概念碎片化</b><p class="muted">业界已经有 runtime、sandbox、MCP、memory、observability、eval、policy 等大量组件，但缺少一个把它们放在同一体系中讨论的框架。</p></div>
+<div class="mini"><b>问题 2：模型视角过强</b><p class="muted">很多 Agent 研究仍习惯把失败归因于模型能力，却低估了执行环境、上下文、权限、验证等系统因素。</p></div>
+<div class="mini"><b>问题 3：实践发展快于理论</b><p class="muted">大量生产级能力首先出现在开源项目和商业产品里，学术文献中的术语与边界尚未完全统一。</p></div>
+</div>
+<h3>作者的三个主要 Claim</h3>
+<table><thead><tr><th>Claim</th><th>含义</th><th>应该怎么理解</th></tr></thead><tbody>
+<tr><td>Conceptual</td><td>Harness 可能成为 Agent reliability 的 binding constraint。</td><td>同一个模型，换一套执行、上下文、验证或治理机制，系统表现可能显著不同。</td></tr>
+<tr><td>Taxonomic</td><td>提出 ETCLOVG 七层框架。</td><td>给 Harness 研究一个统一词汇表，帮助比较不同系统到底“负责哪一层”。</td></tr>
+<tr><td>Empirical</td><td>将 170+ 开源项目映射进 taxonomy。</td><td>不仅做概念归纳，还尝试用真实生态验证：哪些层已经成熟、哪些仍是空白。</td></tr>
+</tbody></table></section>
+
+<section id="definition" class="card"><h2>03｜Harness 到底是什么？先把边界讲清楚</h2>
+<p>这篇文章里的 Harness 不是单指某个 library，也不是 LangGraph、MCP、memory 其中任何一个组件。更接近：</p>
+<div class="map">Foundation Model
+      │
+      ▼
+Agent reasoning / action policy
+      │
+      ▼
+┌─────────────────────────────────────────┐
+│              Agent Harness              │
+│ execution · tools · context · lifecycle │
+│ observability · verification · governance│
+└─────────────────────────────────────────┘
+      │
+      ▼
+Real environment / APIs / files / browser / OS</div>
+<div class="callout green"><b>关键边界：</b>Harness 的关注点不是“模型会不会推理”，而是“怎样把模型能力组织成一个可运行、可控制、可验证的 Agent 系统”。</div>
+<p>因此，Harness Engineering 天然是一个<b>系统工程问题</b>：它跨 runtime、security、software engineering、evaluation、distributed systems、HCI 等多个方向，而不是模型算法的一个小分支。</p></section>
+
+<section id="evolution" class="card"><h2>04｜作者的历史叙事：Prompt → Context → Harness</h2>
+<div class="timeline">
+<div class="phase"><b>阶段 1 · Prompt Engineering</b><p>主要优化“如何对模型下指令”。核心对象仍是一次模型调用。</p><span class="muted">重点：instruction、few-shot、CoT 等。</span></div>
+<div class="phase"><b>阶段 2 · Context Engineering</b><p>关注“模型当前能看到什么”，开始系统化处理记忆、检索、上下文压缩和状态。</p><span class="muted">重点：RAG、memory、context window、compaction。</span></div>
+<div class="phase"><b>阶段 3 · Harness Engineering</b><p>关注“整个 Agent 如何长期、可靠地运行”，把模型嵌入执行、工具、验证、治理等完整系统。</p><span class="muted">重点：runtime、orchestration、observability、verification、governance。</span></div>
+</div>
+<div class="callout yellow"><b>不要把它理解成严格替代关系。</b>Prompt、Context 仍然存在，只是 Harness 把工程视角进一步向系统外层扩展。作者真正想表达的是研究关注点的扩大。</div></section>
+
+<section id="method" class="card"><h2>05｜这篇 Survey 是怎么做的？</h2>
+<p>论文不只是整理概念，还做了一个面向开源生态的项目映射。理解这一点很重要，因为 ETCLOVG 并非纯粹从抽象理论“演绎”出来，而是带有明显的<b>实践归纳</b>色彩。</p>
+<div class="grid2">
+<div class="mini"><b>文献与概念梳理</b><p class="muted">作者汇总 Agent 相关研究与工程术语，尝试把大量彼此重叠的概念放进统一层次结构。</p></div>
+<div class="mini"><b>开源项目映射</b><p class="muted">将 170+ 项目按主要能力归入 ETCLOVG，用生态分布观察各层成熟度与空白。</p></div>
+</div>
+<div class="callout"><b>读 Survey 时要保持一个意识：</b>taxonomy 是分析工具，不是自然界唯一正确的分层。很多真实项目天然跨越多个层；作者的分类更像“主要职责归属”。</div></section>
+
+<section id="taxonomy" class="card"><h2>06｜ETCLOVG 七层：论文的主体</h2>
+<p class="muted">点击任意层查看它解决的问题、典型机制，以及它与相邻层的边界。</p>
+<div class="taxonomy" id="layers">
+<div class="layer active" data-k="E"><div class="letter">E</div><b>Execution</b><small>执行环境</small></div>
+<div class="layer" data-k="T"><div class="letter">T</div><b>Tooling</b><small>工具与协议</small></div>
+<div class="layer" data-k="C"><div class="letter">C</div><b>Context</b><small>上下文与记忆</small></div>
+<div class="layer" data-k="L"><div class="letter">L</div><b>Lifecycle</b><small>生命周期与编排</small></div>
+<div class="layer" data-k="O"><div class="letter">O</div><b>Observability</b><small>可观测性</small></div>
+<div class="layer" data-k="V"><div class="letter">V</div><b>Verification</b><small>验证与评测</small></div>
+<div class="layer" data-k="G"><div class="letter">G</div><b>Governance</b><small>治理与安全</small></div>
+</div>
+<div class="detail" id="detail"></div>
+</section>
+
+<section id="relations" class="card"><h2>07｜七层不是七个孤岛：一次 Agent 行动如何穿过它们？</h2>
+<div class="map">① Lifecycle 决定下一步要做什么
+          │
+          ▼
+② Context 组装当前模型可见信息
+          │
+          ▼
+③ Tooling 把动作转成标准化工具调用
+          │
+          ▼
+④ Execution 在 shell / browser / sandbox 中真正执行
+          │
+          ├──────────────► ⑤ Observability 记录 trace / log / metric
+          │
+          ├──────────────► ⑥ Verification 判断结果是否正确/充分
+          │
+          └──────────────► ⑦ Governance 检查权限、策略与审计要求
+                                   │
+                                   ▼
+                          回到 Lifecycle 继续循环</div>
+<p>这也是为什么论文强调 Harness Engineering 是<b>跨层系统设计</b>。真正的可靠性问题经常不属于某一个单独模块，例如“工具执行错了但没有被发现”同时涉及 Tooling、Execution、Observability 和 Verification。</p></section>
+
+<section id="control" class="card"><h2>08｜Structural Core vs Control Plane</h2>
+<p>论文中一个非常有用的理解方式，是把七层进一步看成两类功能：</p>
+<div class="grid2">
+<div class="mini"><b>Structural Core</b><p><b>E / T / C / L</b></p><p class="muted">它们让 Agent “能够行动”：有执行环境、有工具、有上下文、有生命周期和编排。</p></div>
+<div class="mini"><b>Control Plane</b><p><b>O / V / G</b></p><p class="muted">它们让 Agent “可被管理”：知道它做了什么、判断它做得对不对、限制它能做什么。</p></div>
+</div>
+<div class="callout green"><b>这是论文最值得保留的系统观之一：</b>一个 Agent 能跑起来，不等于它已经具备生产级 Harness。生产化的困难往往正集中在 O / V / G。</div></section>
+
+<section id="tradeoffs" class="card"><h2>09｜作者强调的三类跨层权衡</h2>
+<div class="grid3">
+<div class="mini"><b>Cost · Quality · Speed</b><p class="muted">更多检索、更强 verifier、更长轨迹通常提高质量，却也增加 token、延迟和运行成本。Harness 的目标不是单点最优，而是系统级折中。</p></div>
+<div class="mini"><b>Capability · Control</b><p class="muted">给 Agent 更强 shell、browser、filesystem 权限会提升能力，但攻击面和误操作风险同步扩大。</p></div>
+<div class="mini"><b>Model · Harness Coupling</b><p class="muted">Harness 往往隐含对特定模型能力和缺陷的假设；模型升级后，过去有效的 scaffolding 可能变成冗余甚至约束。</p></div>
+</div>
+<p>这三组矛盾说明：Harness 不是简单“把组件堆得越多越好”。真正的设计问题是<b>哪些控制值得付出复杂度和成本</b>。</p></section>
+
+<section id="ecosystem" class="card"><h2>10｜170+ 开源项目映射，说明了什么？</h2>
+<p>作者将大量真实项目映射到七层，试图回答“Agent 工程生态目前发展到了哪里”。最值得关注的并不是具体项目数量，而是<b>成熟度分布的不均衡</b>。</p>
+<table><thead><tr><th>观察</th><th>论文带来的解释</th></tr></thead><tbody>
+<tr><td>Lifecycle / Orchestration 非常活跃</td><td>Agent framework 最早、最明显的需求就是“让模型循环起来、管理状态并编排多步骤任务”，因此这一层工具非常丰富。</td></tr>
+<tr><td>Execution / Tooling 已形成较清晰工程形态</td><td>shell、browser、sandbox、API/tool protocol 等已经出现大量稳定实践。</td></tr>
+<tr><td>Verification 正快速成为核心层</td><td>Agent 从“生成答案”转向“执行任务”之后，仅靠语言质量无法判断任务是否真的完成，因此 verifier/test/eval 重要性上升。</td></tr>
+<tr><td>Observability / Governance 相对欠成熟</td><td>这两层在生产系统里极重要，但部分能力仍集中在商业平台、内部基础设施或安全体系中，开源生态相对分散。</td></tr>
+</tbody></table>
+<div class="callout yellow"><b>注意：</b>“项目多”不等于“问题已经解决”。开源数量只能说明关注度和工具生态，不能直接证明某层已经形成统一标准。</div></section>
+
+<section id="insights" class="card"><h2>11｜这篇论文真正的新意在哪里？</h2>
+<div class="grid2">
+<div class="mini"><b>新意 1：把 Harness 从“杂项工程”提升为研究对象</b><p class="muted">过去 execution、memory、eval、security 往往分别讨论；论文试图说明它们其实共同决定 Agent 系统质量。</p></div>
+<div class="mini"><b>新意 2：统一语言</b><p class="muted">ETCLOVG 的价值首先是沟通：看到一个新系统时，可以快速判断它主要创新在哪一层，缺失哪一层。</p></div>
+<div class="mini"><b>新意 3：把可靠性问题从模型内部移向系统层</b><p class="muted">Agent failure 不应自动归因于“模型不够聪明”；错误也可能来自 context 污染、tool schema、sandbox、state recovery 或 verifier。</p></div>
+<div class="mini"><b>新意 4：强调控制面</b><p class="muted">Observability、Verification、Governance 被独立出来，体现 Agent 从 demo 走向 production 后关注点的变化。</p></div>
+</div></section>
+
+<section id="limits" class="card"><h2>12｜这篇论文有哪些局限？</h2>
+<div class="qa">
+<details open><summary>① Taxonomy 是否有唯一性？</summary><p>没有。七层是作者提出的分析框架，边界存在主观性。例如 memory 既可以视为 Context，也可能涉及 Lifecycle；sandbox 既属于 Execution，也与 Governance 紧密相关。</p></details>
+<details><summary>② 开源项目映射能否代表全部生产实践？</summary><p>不能。大型公司的 observability、policy、audit、runtime infrastructure 很多并不开源，因此开源分布可能系统性低估某些生产级能力。</p></details>
+<details><summary>③ “Harness 是瓶颈”能否普遍成立？</summary><p>更准确地说，这是论文提出并用若干现象支持的研究判断，而不是对所有 Agent 任务都已被严格证明的普遍定律。模型能力仍然可能是主要瓶颈。</p></details>
+<details><summary>④ 七层会不会很快变化？</summary><p>会。Agent 领域迭代很快，协议、memory、sandbox、verification、computer-use 等方向仍在快速演化，因此 taxonomy 更适合作为当前阶段的组织框架，而不是永久标准。</p></details>
+</div></section>
+
+<section id="reading" class="card"><h2>13｜如果你现在去读原文，建议这样读</h2>
+<ol class="reading">
+<li><b>先读 Abstract + Introduction：</b>只抓一个问题——为什么作者认为 Harness 值得成为独立研究对象。</li>
+<li><b>再读 taxonomy 总图：</b>先建立 ETCLOVG 的整体结构，不要一开始陷入项目名和工具名。</li>
+<li><b>逐层读 E→T→C→L→O→V→G：</b>每层只记三件事：它解决什么、典型机制是什么、与相邻层边界在哪里。</li>
+<li><b>重点读 cross-cutting synthesis：</b>这里比项目罗列更有研究价值，因为它讨论 cost/control/coupling 这些真正的系统问题。</li>
+<li><b>最后看 ecosystem mapping：</b>把它当“证据和现状扫描”，而不是把所有项目名称都记住。</li>
+<li><b>回到 Discussion / Limitations：</b>判断哪些是作者的事实总结，哪些是带方向性的观点。</li>
+</ol></section>
+
+<section id="notes" class="card"><h2>14｜一页论文笔记</h2>
+<table><tbody>
+<tr><td>研究对象</td><td>Agent Harness Engineering：模型/Agent policy 外围、负责把 Agent 变成可运行系统的一整套工程机制。</td></tr>
+<tr><td>核心问题</td><td>现有 Agent 工程能力碎片化，缺乏统一 taxonomy，也容易过度把可靠性问题归因于模型。</td></tr>
+<tr><td>核心框架</td><td>ETCLOVG：Execution、Tooling、Context、Lifecycle & Orchestration、Observability、Verification & Evaluation、Governance & Security。</td></tr>
+<tr><td>结构理解</td><td>E/T/C/L 更像 Structural Core；O/V/G 更像 Control Plane。</td></tr>
+<tr><td>经验材料</td><td>170+ 开源项目映射，用于观察各层生态与成熟度。</td></tr>
+<tr><td>关键洞见</td><td>生产级 Agent 的瓶颈可能从“模型能力”转向“Harness 设计”；可靠性是跨层系统属性。</td></tr>
+<tr><td>三类权衡</td><td>Cost–Quality–Speed；Capability–Control；Model–Harness Coupling。</td></tr>
+<tr><td>最重要的保留意见</td><td>七层不是唯一分类；开源生态不完全代表闭源生产系统；“Harness 成为瓶颈”更像研究命题而非已普遍证明的定律。</td></tr>
+</tbody></table></section>
+
+<section id="sources" class="card"><h2>原文入口</h2>
+<p><b>OpenReview / TMLR：</b><br><a class="source" href="https://openreview.net/forum?id=eONq7FdiHa" target="_blank" rel="noreferrer">https://openreview.net/forum?id=eONq7FdiHa</a></p>
+<p><b>作者项目页：</b><br><a class="source" href="https://picrew.github.io/LLM-Harness/" target="_blank" rel="noreferrer">https://picrew.github.io/LLM-Harness/</a></p>
+<p><b>配套开源项目数据集：</b><br><a class="source" href="https://huggingface.co/datasets/ChenLiu1996/Agent-Harness-Engineering" target="_blank" rel="noreferrer">https://huggingface.co/datasets/ChenLiu1996/Agent-Harness-Engineering</a></p>
+<p class="muted">注：论文处于持续更新阶段。项目数量、分类与表述应以作者最新版原文为准。</p></section>
+</main></div>
+<footer class="footer"><div class="container">本页定位：论文导读 / 精读笔记。重点是理解论文的问题意识、框架、证据与局限，而非把内容压缩成求职话术。</div></footer>
+<script>
+const data={
+E:{title:'E · Execution｜执行环境',desc:'解决“Agent 的动作在哪里真正发生”。模型产生 action 之后，需要 shell、filesystem、browser、container 或 sandbox 把它转成现实世界的状态变化。',q:'核心问题：怎样提供足够强的执行能力，同时保持隔离、可复现和故障恢复能力？',tags:['Shell','Browser','Filesystem','Container','Sandbox','Environment']},
+T:{title:'T · Tooling｜工具与协议',desc:'解决“Agent 如何发现、描述并调用外部能力”。它把内部 action intention 转换成结构化 API/tool 调用，并处理 schema、协议、路由和结果返回。',q:'与 Execution 的边界：Tooling 更关心调用接口和协议；Execution 更关心动作真正在哪里、以什么权限运行。',tags:['Tool calling','Schema','MCP','A2A','API','Tool registry']},
+C:{title:'C · Context｜上下文',desc:'解决“模型这一轮到底看见什么”。包括短期历史、长期记忆、检索结果、工作区状态、上下文压缩与选择。',q:'关键难点不是简单“塞更多信息”，而是在 token 预算下维持相关性、一致性与长期状态。',tags:['Memory','RAG','Retrieval','Compaction','State','Context window']},
+L:{title:'L · Lifecycle & Orchestration｜生命周期与编排',desc:'解决“Agent 怎样从启动到结束持续运行”。包括 agent loop、状态机、workflow、checkpoint、session、任务分解、多 Agent 协作与恢复。',q:'这一层常被误认为整个 Harness；论文的关键贡献之一就是指出：orchestration 只是 Harness 的一个部分。',tags:['Agent loop','Workflow','State machine','Checkpoint','Session','Multi-agent']},
+O:{title:'O · Observability｜可观测性',desc:'解决“我们怎样知道 Agent 内部发生了什么”。它记录执行轨迹、日志、指标、token/latency/cost，以及跨组件因果链路。',q:'没有 observability，复杂 Agent 失败后很难区分是模型、context、tool、runtime 还是 policy 出了问题。',tags:['Trace','Log','Metric','Telemetry','Cost','Debugging']},
+V:{title:'V · Verification & Evaluation｜验证与评测',desc:'解决“Agent 做完之后，怎么判断它真的做对了”。包括 test、verifier、reward、benchmark、trajectory evaluation 与任务完成判定。',q:'Agent 从回答问题转向执行任务后，语言看起来合理远远不够；结果必须被外部证据或可执行测试验证。',tags:['Verifier','Tests','Eval','Benchmark','Trajectory','Task success']},
+G:{title:'G · Governance & Security｜治理与安全',desc:'解决“Agent 被允许做什么，以及出了问题如何追责”。包括权限、policy、审批、审计、隔离、安全边界和人类监督。',q:'Governance 不是单纯安全过滤，而是生产环境中的权限模型、责任边界和控制机制。',tags:['Permission','Policy','Audit','Approval','Security','Human oversight']}
+};
+const detail=document.getElementById('detail');
+function render(k){const x=data[k];detail.innerHTML=`<h3 style="margin-top:0">${x.title}</h3><p>${x.desc}</p><p class="muted">${x.q}</p><div class="chips">${x.tags.map(t=>`<span class="chip">${t}</span>`).join('')}</div>`}
+render('E');document.querySelectorAll('.layer').forEach(el=>el.addEventListener('click',()=>{document.querySelectorAll('.layer').forEach(x=>x.classList.remove('active'));el.classList.add('active');render(el.dataset.k)}));
+</script>
+</body></html>

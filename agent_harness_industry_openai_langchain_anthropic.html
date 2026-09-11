@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Agent Harness 工业实践三篇精读｜OpenAI × LangChain × Anthropic</title>
+<style>
+:root{
+  --paper:#f5f1e8;
+  --paper2:#eee7da;
+  --card:#fbf8f1;
+  --ink:#25231f;
+  --muted:#716b63;
+  --line:#d8cebd;
+  --dai:#45555a;
+  --qing:#637c72;
+  --zhu:#a45e50;
+  --gold:#b38b50;
+  --lan:#60798a;
+  --zi:#756575;
+  --shadow:0 14px 40px rgba(66,54,40,.09);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  color:var(--ink);
+  background:
+    radial-gradient(circle at 10% 4%,rgba(99,124,114,.09),transparent 26%),
+    radial-gradient(circle at 90% 10%,rgba(179,139,80,.08),transparent 24%),
+    linear-gradient(180deg,#f8f5ef 0%,var(--paper) 58%,#eee8de 100%);
+  font-family:"Noto Serif SC","Songti SC","STSong","Source Han Serif SC","Microsoft YaHei",serif;
+  line-height:1.78;
+}
+a{color:var(--lan);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1260px;margin:auto;padding:0 24px 80px}
+.hero{padding:74px 0 42px;border-bottom:1px solid var(--line)}
+.kicker{
+  display:inline-block;padding:7px 12px;border:1px solid rgba(99,124,114,.35);
+  border-radius:999px;font-size:13px;letter-spacing:.12em;color:var(--qing);
+  background:rgba(255,255,255,.32)
+}
+h1{font-size:clamp(36px,5vw,64px);line-height:1.12;margin:18px 0 14px;letter-spacing:-.03em}
+h1 span{color:var(--dai)}
+.subtitle{font-size:19px;color:var(--muted);max-width:950px}
+.meta{display:flex;gap:9px;flex-wrap:wrap;margin-top:22px}
+.meta span{padding:7px 10px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.4);font-size:13px;color:#5d5750}
+.hero-note{
+  margin-top:28px;padding:20px 22px;border-left:4px solid var(--zhu);
+  background:linear-gradient(90deg,rgba(164,94,80,.08),rgba(255,255,255,.18));
+  font-size:18px
+}
+.layout{display:grid;grid-template-columns:245px minmax(0,1fr);gap:34px;margin-top:34px}
+aside{
+  position:sticky;top:18px;align-self:start;background:rgba(251,248,241,.74);
+  border:1px solid var(--line);border-radius:18px;padding:18px;box-shadow:var(--shadow);
+  backdrop-filter:blur(8px)
+}
+aside b{display:block;margin-bottom:9px;color:var(--dai)}
+aside a{display:block;padding:7px 8px;border-radius:8px;font-size:14px;color:#5c5751}
+aside a:hover{background:#ece5d9;color:var(--zhu);text-decoration:none}
+section{padding:27px 0 17px;scroll-margin-top:20px}
+h2{font-size:29px;margin:0 0 16px;color:#34312d}
+h2 .n{font-size:13px;color:var(--zhu);margin-right:8px;letter-spacing:.1em}
+h3{font-size:20px;color:var(--dai);margin:22px 0 10px}
+p{margin:10px 0}
+.note{color:var(--muted);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}
+.card{
+  padding:19px 20px;border:1px solid var(--line);border-radius:16px;
+  background:rgba(251,248,241,.88);box-shadow:0 8px 26px rgba(74,61,46,.055)
+}
+.card h3{margin-top:0}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;border:1px solid currentColor;font-size:12px;margin-right:6px}
+.bq{color:var(--qing)}.bz{color:var(--zhu)}.bg{color:var(--gold)}.bl{color:var(--lan)}.bp{color:var(--zi)}
+.quote{
+  padding:22px 24px;border-left:4px solid var(--gold);
+  background:rgba(179,139,80,.07);font-size:21px;color:#45413b;margin:18px 0
+}
+.callout{
+  padding:20px 22px;border:1px solid rgba(96,121,138,.22);
+  border-radius:15px;background:rgba(96,121,138,.055);margin:16px 0
+}
+.tabs{display:flex;flex-wrap:wrap;gap:9px;margin:18px 0}
+.tabs button{
+  cursor:pointer;border:1px solid var(--line);background:#faf7f0;color:#514c46;
+  padding:10px 15px;border-radius:999px;font-family:inherit;transition:.2s
+}
+.tabs button:hover,.tabs button.active{background:#e9e2d6;color:var(--zhu);transform:translateY(-1px)}
+.panel{display:none}.panel.active{display:block}
+table{width:100%;border-collapse:collapse;background:rgba(251,248,241,.86);border-radius:14px;overflow:hidden}
+th,td{padding:13px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{background:#e9e2d6;color:#49453f}
+tr:last-child td{border-bottom:none}
+.flow{display:grid;grid-template-columns:1fr 70px 1fr 70px 1fr;align-items:stretch;gap:8px;margin:20px 0}
+.arr{display:flex;justify-content:center;align-items:center;color:var(--zhu);font-size:25px}
+.timeline{position:relative;padding-left:29px;margin:18px 0}
+.timeline:before{content:"";position:absolute;left:8px;top:4px;bottom:4px;width:2px;background:var(--line)}
+.t{position:relative;margin:16px 0}
+.t:before{content:"";position:absolute;left:-25px;top:10px;width:10px;height:10px;border-radius:50%;background:var(--zhu);box-shadow:0 0 0 4px #f1ebe1}
+.stack{display:flex;flex-wrap:wrap;gap:8px;margin:13px 0}
+.stack span{padding:7px 10px;border:1px solid #d8cebd;border-radius:999px;background:#eee7dc;font-size:13px}
+.compare td:first-child{font-weight:700;color:var(--dai);width:18%}
+.take{border-left:4px solid var(--qing)}
+.source{font-size:14px;color:var(--muted)}
+footer{border-top:1px solid var(--line);margin-top:35px;padding-top:22px;color:var(--muted);font-size:13px}
+@media(max-width:930px){
+  .layout{grid-template-columns:1fr} aside{position:relative;top:auto}
+  .grid,.grid3{grid-template-columns:1fr}
+  .flow{grid-template-columns:1fr}.arr{transform:rotate(90deg)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="kicker">INDUSTRY PRACTICE · 2026</div>
+  <h1><span>Agent Harness 工业实践三篇精读</span><br/>OpenAI × LangChain × Anthropic</h1>
+  <p class="subtitle">把三篇工业界一手文章放在同一套框架中阅读：LangChain 从模型能力缺口反推 Harness 组件；OpenAI 展示 Agent-first 软件工程如何真正落地；Anthropic 则讨论 Harness 如何随着模型能力提升而不断重构。</p>
+  <div class="meta">
+    <span>OpenAI · 2026-02-11</span>
+    <span>LangChain · 2026-03-10</span>
+    <span>Anthropic · 2026-03-24</span>
+    <span>官方原文精读</span>
+    <span>中国传统色系阅读版</span>
+  </div>
+  <div class="hero-note"><b>三篇合起来最重要的认识：</b>Harness 不是固定的软件框架，而是一组围绕模型能力、任务边界和生产约束动态形成的工程结构。模型变强后，有些 scaffold 应该被删除；任务变复杂后，又需要新的环境、反馈和控制机制补上。</div>
+</header>
+
+<div class="layout">
+<aside>
+  <b>阅读导航</b>
+  <a href="#map">01 三篇文章的定位</a>
+  <a href="#langchain">02 LangChain：Harness Anatomy</a>
+  <a href="#openai">03 OpenAI：Agent-first Engineering</a>
+  <a href="#anthropic">04 Anthropic：Long-running Harness</a>
+  <a href="#common">05 三家共同结论</a>
+  <a href="#diff">06 三家关键差异</a>
+  <a href="#evolution">07 Harness 如何随模型演化</a>
+  <a href="#system">08 一张统一架构图</a>
+  <a href="#limits">09 应该保留的判断</a>
+  <a href="#takeaways">10 最终总结</a>
+  <a href="#sources">11 官方原文</a>
+</aside>
+
+<main>
+
+<section id="map">
+  <h2><span class="n">01</span>先看地图：三篇文章分别解决什么问题？</h2>
+  <div class="flow">
+    <div class="card"><span class="badge bq">LangChain</span><h3>Harness 有什么？</h3><p>从“模型原生做不到什么”出发，反向推导 filesystem、bash、sandbox、memory、compaction、planning、subagents、verification 等组件。</p></div>
+    <div class="arr">→</div>
+    <div class="card"><span class="badge bz">OpenAI</span><h3>怎样真正跑起来？</h3><p>通过一个百万行、零人工手写代码的内部产品，说明环境、知识、架构约束和反馈循环如何让 Agent 形成可持续工程产能。</p></div>
+    <div class="arr">→</div>
+    <div class="card"><span class="badge bg">Anthropic</span><h3>什么时候该改 Harness？</h3><p>通过长任务 coding 实验说明：Harness 组件是否有价值，取决于任务是否超过当前模型的可靠能力边界。</p></div>
+  </div>
+  <div class="quote">LangChain 更像“解剖学”，OpenAI 更像“生产工程案例”，Anthropic 更像“模型—Harness 联合实验”。</div>
+</section>
+
+<section id="langchain">
+  <h2><span class="n">02</span>LangChain：The Anatomy of an Agent Harness</h2>
+  <div class="callout"><b>核心定义：</b>Agent = Model + Harness。只要不是模型本身，而是在帮助模型保持状态、执行动作、获取反馈、施加约束的代码与配置，都可以被视为 Harness 的一部分。</div>
+
+  <h3>2.1 这篇文章的推理方法</h3>
+  <p>它不是先列组件，而是采用一个非常清楚的逆向设计逻辑：</p>
+  <div class="quote">我们希望 Agent 具备某种行为 → 找到模型原生能力缺口 → 在 Harness 中加入对应机制。</div>
+
+  <div class="grid3">
+    <div class="card"><h3>Filesystem</h3><p>解决持久状态、跨 session 工作、超出 context 的中间结果存储问题。LangChain 将它视为最基础的 Harness primitive 之一。</p></div>
+    <div class="card"><h3>Bash + Code</h3><p>用通用执行能力替代“为每件事预先设计一个 tool”，让模型动态构造解决方法。</p></div>
+    <div class="card"><h3>Sandbox</h3><p>决定模型在哪里运行代码、能够访问什么资源、如何隔离风险，并为并行任务提供可复制环境。</p></div>
+    <div class="card"><h3>Memory + Search</h3><p>通过文件、AGENTS.md、Web Search、MCP 等把训练后出现的新知识和历史信息送回 context。</p></div>
+    <div class="card"><h3>Compaction</h3><p>应对 context rot：摘要旧上下文、offload 大型 tool output，并通过 progressive disclosure 减少一开始加载的信息。</p></div>
+    <div class="card"><h3>Planning / Subagents</h3><p>解决长任务分解与并行；子 Agent 通过 isolated context 避免主上下文被不同子任务相互污染。</p></div>
+  </div>
+
+  <h3>2.2 这篇最值得留下的观点</h3>
+  <p><b>Harness 本质上是“把模型智能变成有效工作的系统”。</b>模型负责 intelligence；Harness 决定这种 intelligence 能看到什么、能做什么、如何持续做、怎样知道自己做对了。</p>
+  <p>另外一个很重要的观点是：今天的 Harness 很大程度上是 <b>context engineering 的 delivery mechanism</b>。filesystem、memory、search、compaction、skills 看似功能不同，本质上都在解决“有限 context 中什么时候放什么信息”。</p>
+
+  <h3>2.3 Model–Harness Co-evolution</h3>
+  <p>LangChain 还特别讨论了模型在特定 Harness 中后训练后产生的耦合：工具格式甚至编辑逻辑发生变化，都可能影响模型表现。这意味着 Harness 不是完全可替换的外壳；模型和 Harness 可能共同形成一个行为系统。</p>
+</section>
+
+<section id="openai">
+  <h2><span class="n">03</span>OpenAI：Harness engineering in an agent-first world</h2>
+  <div class="callout"><b>实验背景：</b>OpenAI 团队用 Codex 构建一个真实内部产品，所有 application code、tests、CI、docs、observability 与内部 tooling 都由 Codex 写成。文章报告约百万行代码、约 1,500 个 PR，最初由 3 名工程师驱动。</div>
+
+  <h3>3.1 最大变化：工程师不再主要写代码</h3>
+  <p>文章最重要的不是“Codex 写了多少代码”，而是人的工作发生了层级迁移：</p>
+  <div class="grid">
+    <div class="card"><h3>旧工作</h3><p>设计 → 实现 → Debug → Review → 测试 → 修代码。</p></div>
+    <div class="card"><h3>新工作</h3><p>设计 environment、明确 intent、构建 tools、暴露 feedback、编码 invariants，让 Agent 自己完成实现与修复。</p></div>
+  </div>
+  <p>团队遇到失败时，问题不再是“怎么让 Codex 再努力一点”，而是：<b>系统缺了什么能力？怎样让这个能力对 Agent 可见，并且可以被机械执行？</b></p>
+
+  <h3>3.2 Agent Legibility：这篇文章的中心概念</h3>
+  <p>OpenAI 的核心设计目标是让整个工程系统对 Agent “可读”。如果知识只存在于 Slack、Google Docs 或某个人脑子里，对运行中的 Agent 来说几乎等于不存在。</p>
+  <div class="stack">
+    <span>Repo-local docs</span><span>Versioned plans</span><span>Architecture maps</span>
+    <span>Logs</span><span>Metrics</span><span>Traces</span><span>Browser state</span><span>Test results</span>
+  </div>
+  <p>因此他们没有把 AGENTS.md 做成超长百科，而是让它成为约百行的“目录”，再将知识组织到结构化 docs/ 中，通过 progressive disclosure 逐步展开。</p>
+
+  <h3>3.3 Feedback Loop 才是真正的 Harness</h3>
+  <p>Codex 可以访问浏览器、DOM snapshots、screenshots、logs、metrics 和 traces，因此它能够自己复现 bug、实现修复、运行应用、观察结果，再继续调整。长时间运行时，单次任务甚至可以持续数小时。</p>
+
+  <h3>3.4 Enforce Architecture, Not Every Implementation</h3>
+  <p>文章强调的是“机械化约束边界”，而不是告诉 Agent 每行代码怎样写。依赖方向、schema、structured logging、file size、命名规范等都通过 custom lints 和 structural tests 固化。</p>
+  <div class="quote">对 Agent 而言，好的约束不是减少自主性，而是提供一个可以高速行动而不发生架构漂移的空间。</div>
+
+  <h3>3.5 Entropy 与 Garbage Collection</h3>
+  <p>完全 Agent-generated 的代码库会复制已有坏模式，因此会不断积累 entropy。OpenAI 最初人工清理“AI slop”，后来把原则编码成规则，并通过周期性后台 Agent 自动发现偏差、打开重构 PR。</p>
+  <p>这使技术债治理变成一种持续的“垃圾回收”，而不是几个月后一次大型清理。</p>
+</section>
+
+<section id="anthropic">
+  <h2><span class="n">04</span>Anthropic：Harness design for long-running application development</h2>
+  <div class="callout"><b>研究问题：</b>如何让 Claude 在几小时尺度上自主构建完整应用，并且保持产品完整性、设计质量和功能正确性？</div>
+
+  <h3>4.1 Naive Long-running Agent 为什么会失控</h3>
+  <p>Anthropic 观察到两个典型问题：长任务导致 coherence 下降，以及部分模型临近 context 边界时会出现“context anxiety”——提前收尾、草草完成。</p>
+  <p>早期 Harness 因此使用 <b>context reset + structured handoff</b>：清空上下文、启动新 Agent，再把上一阶段的状态和下一步任务以结构化 artifact 交过去。</p>
+
+  <h3>4.2 Planner → Generator → Evaluator</h3>
+  <div class="grid3">
+    <div class="card"><span class="badge bq">Planner</span><h3>扩展意图</h3><p>把 1–4 句简单需求扩成完整产品 spec，但刻意不把实现细节规定死，避免错误设计向下游级联。</p></div>
+    <div class="card"><span class="badge bz">Generator</span><h3>真正构建</h3><p>按 feature / sprint 实现应用，使用 git，并在交给 QA 前先 self-evaluate。</p></div>
+    <div class="card"><span class="badge bg">Evaluator</span><h3>真实使用验证</h3><p>借助 Playwright MCP 操作真实运行中的应用，检查 UI、API、数据库状态，并依据 testable contract 提交具体 bug。</p></div>
+  </div>
+
+  <h3>4.3 Evaluator 的真正意义</h3>
+  <p>Evaluator 不是简单的 LLM Judge，而是能够真正运行应用的 QA Agent。它检查的是“产品是否真的可用”，不是“代码看起来是否合理”。</p>
+  <p>这揭示了 Harness 的重要设计原则：<b>Verification 应尽量接近目标环境，而不是停留在生成文本本身。</b></p>
+
+  <h3>4.4 最重要的新结论：Model 变强后，要删 Harness</h3>
+  <p>当模型从 Opus 4.5 升级到 4.6，一些原本关键的机制变得不再 load-bearing。比如更强模型能持续更长时间工作，于是原本的 sprint decomposition 和部分中间 evaluator 开销可以减少。</p>
+  <div class="quote">Harness 不是越复杂越好。每次模型升级后，都应该重新检查哪些 scaffold 已经失去作用，并把它们删除。</div>
+  <p>文章给出的判断非常精确：Evaluator 是否值得使用，取决于任务位于模型可靠能力边界的哪一侧。模型自己已经稳定能做的工作，再加 evaluator 可能只是额外成本；接近能力边缘时，Evaluator 才真正提供 lift。</p>
+
+  <h3>4.5 一个真实成本例子</h3>
+  <p>文章后续更新版 Harness 构建浏览器 DAW 的一次运行约持续 3 小时 50 分钟，token 成本约 124.70 美元。它说明 long-horizon autonomy 在 2026 年已经可行，但仍然是明显的工程与成本权衡，而不是“无限免费自治”。</p>
+</section>
+
+<section id="common">
+  <h2><span class="n">05</span>三家共同结论：真正稳定的共识是什么？</h2>
+  <div class="grid">
+    <div class="card take"><h3>① 环境比 Prompt 更重要</h3><p>高能力 Agent 的性能越来越取决于它能进入什么环境、拿到什么工具、看到什么反馈。</p></div>
+    <div class="card take"><h3>② Context 是稀缺资源</h3><p>不是“给得越多越好”，而是要 progressive disclosure、compaction、offloading 和结构化知识。</p></div>
+    <div class="card take"><h3>③ Verification 必须闭环</h3><p>tests、browser、logs、metrics、QA Agent 都是在把“生成”变成“生成—观察—修正”的闭环。</p></div>
+    <div class="card take"><h3>④ Harness 与模型共同决定能力</h3><p>同一个模型换 Harness 可能有显著表现差异；反过来模型升级也会使旧 Harness 失效。</p></div>
+    <div class="card take"><h3>⑤ 长任务依赖外部状态</h3><p>filesystem、git、structured artifacts、plans 等承担了单个 context window 无法持久保存的工作状态。</p></div>
+    <div class="card take"><h3>⑥ 人类角色向控制层迁移</h3><p>人的高价值工作从逐行实现转向目标设定、环境设计、约束编码、验收和系统治理。</p></div>
+  </div>
+</section>
+
+<section id="diff">
+  <h2><span class="n">06</span>三家的关键差异</h2>
+  <table class="compare">
+    <tr><th>维度</th><th>LangChain</th><th>OpenAI</th><th>Anthropic</th></tr>
+    <tr><td>核心问题</td><td>Harness 是什么、有哪些 primitive</td><td>怎样组织 Agent-first 软件团队</td><td>怎样让 Agent 长时间自主构建复杂应用</td></tr>
+    <tr><td>分析视角</td><td>概念/架构推导</td><td>真实生产案例</td><td>实验迭代 / Harness tuning</td></tr>
+    <tr><td>最强调</td><td>Filesystem、bash、sandbox、context management</td><td>Legibility、repo knowledge、architecture enforcement、feedback loops</td><td>Task decomposition、planner-generator-evaluator、模型升级后删 scaffold</td></tr>
+    <tr><td>对 Harness 的隐含定义</td><td>模型之外让智能可用的一切系统</td><td>让 Agent 自主完成工程工作的环境和控制系统</td><td>针对当前模型能力边界设计的任务结构与验证系统</td></tr>
+    <tr><td>最有价值的启示</td><td>从 desired behavior 反推 Harness</td><td>真正的 Agent-first 工程必须让整个开发环境 agent-legible</td><td>Harness 必须动态适配模型，复杂度不是永久资产</td></tr>
+  </table>
+</section>
+
+<section id="evolution">
+  <h2><span class="n">07</span>Harness 如何随模型能力演化？</h2>
+  <div class="timeline">
+    <div class="t"><h3>模型能力弱</h3><p>需要更多 planning、task decomposition、context reset、严格 workflow 和多轮 verification 来补足能力。</p></div>
+    <div class="t"><h3>模型能力增强</h3><p>部分 scaffold 失去 load-bearing 作用；更简单的 loop 可能就能完成过去必须分阶段完成的任务。</p></div>
+    <div class="t"><h3>任务复杂度继续提升</h3><p>开发者不会停下来，而是把 Harness 的能力边界继续向外推：更复杂环境、更长任务、更真实 QA、更高自治。</p></div>
+  </div>
+  <div class="callout"><b>因此 Harness Engineering 不是“修补模型缺陷”的临时职业。</b>模型越强，人们越可能给它更复杂的任务，于是 Harness 的研究空间会迁移，而不是简单消失。</div>
+</section>
+
+<section id="system">
+  <h2><span class="n">08</span>把三篇文章合成一张统一架构图</h2>
+  <table>
+    <tr><th>层</th><th>主要内容</th><th>三篇对应观点</th></tr>
+    <tr><td><b>Intent / Planning</b></td><td>目标、spec、execution plan、task decomposition</td><td>Anthropic Planner；OpenAI execution plans</td></tr>
+    <tr><td><b>Context</b></td><td>AGENTS.md、docs、memory、search、compaction、skills</td><td>LangChain context engineering；OpenAI repository knowledge</td></tr>
+    <tr><td><b>Execution</b></td><td>filesystem、bash、sandbox、browser、runtime</td><td>LangChain primitives；OpenAI isolated worktrees</td></tr>
+    <tr><td><b>Feedback</b></td><td>tests、logs、metrics、traces、browser observation</td><td>OpenAI agent legibility；LangChain self-verification</td></tr>
+    <tr><td><b>Verification</b></td><td>self-review、agent review、Evaluator、acceptance criteria</td><td>Anthropic Evaluator；OpenAI agent-to-agent reviews</td></tr>
+    <tr><td><b>Governance</b></td><td>architecture invariants、permissions、network isolation、lint</td><td>OpenAI mechanical constraints；LangChain sandbox</td></tr>
+    <tr><td><b>Adaptation</b></td><td>根据 trace 和模型升级调整 Harness</td><td>Anthropic “remove no-longer-load-bearing scaffold”</td></tr>
+  </table>
+</section>
+
+<section id="limits">
+  <h2><span class="n">09</span>读工业界文章时要保留的判断</h2>
+  <div class="grid">
+    <div class="card"><h3>不是学术 Benchmark</h3><p>三篇都非常有工程价值，但 OpenAI/Anthropic 的结果主要来自特定内部环境、特定模型与特定任务，不等同于跨场景普遍因果结论。</p></div>
+    <div class="card"><h3>供应商天然偏向自身技术栈</h3><p>OpenAI 围绕 Codex、Anthropic 围绕 Claude、LangChain 围绕自己的 agent tooling。应吸收设计思想，而不是机械复制产品选择。</p></div>
+    <div class="card"><h3>Harness 的“正确答案”不存在</h3><p>同一种结构在不同模型能力边界下可能从关键组件变成冗余开销。</p></div>
+    <div class="card"><h3>复杂度必须由失败模式驱动</h3><p>真正好的 Harness 不是功能最多，而是每个组件都对应一个可以观察到的失败模式或生产需求。</p></div>
+  </div>
+</section>
+
+<section id="takeaways">
+  <h2><span class="n">10</span>三篇读完，应该真正留下的 10 条理解</h2>
+  <div class="grid">
+    <div class="card"><b>01</b><p>Harness 是模型智能与现实工作之间的工程转换层。</p></div>
+    <div class="card"><b>02</b><p>设计 Harness 的起点应该是“模型在哪种行为上失败”，而不是先堆框架。</p></div>
+    <div class="card"><b>03</b><p>Filesystem 是非常基础但经常被低估的 Agent primitive。</p></div>
+    <div class="card"><b>04</b><p>真正有效的 context engineering 依赖结构化、渐进式的信息暴露。</p></div>
+    <div class="card"><b>05</b><p>Agent 的能力很大程度来自它能否观察自己行动后的真实结果。</p></div>
+    <div class="card"><b>06</b><p>生产环境需要把“正确做法”编码成可机械检查的约束。</p></div>
+    <div class="card"><b>07</b><p>长时自主任务必须解决状态持久化、上下文退化和终止判断。</p></div>
+    <div class="card"><b>08</b><p>Evaluator 的价值取决于任务是否超过当前模型的可靠边界。</p></div>
+    <div class="card"><b>09</b><p>模型升级后应重新审计 Harness，删除失去作用的 scaffold。</p></div>
+    <div class="card"><b>10</b><p>Harness Engineering 的终点不是更复杂，而是用最合适的系统结构释放当前模型的能力。</p></div>
+  </div>
+</section>
+
+<section id="sources">
+  <h2><span class="n">11</span>官方原文</h2>
+  <div class="card source">
+    <p><b>OpenAI</b> — Harness engineering: leveraging Codex in an agent-first world<br>
+      <a href="https://openai.com/index/harness-engineering/" target="_blank">https://openai.com/index/harness-engineering/</a>
+    </p>
+    <p><b>LangChain</b> — The Anatomy of an Agent Harness<br>
+      <a href="https://www.langchain.com/blog/the-anatomy-of-an-agent-harness" target="_blank">https://www.langchain.com/blog/the-anatomy-of-an-agent-harness</a>
+    </p>
+    <p><b>Anthropic</b> — Harness design for long-running application development<br>
+      <a href="https://www.anthropic.com/engineering/harness-design-long-running-apps" target="_blank">https://www.anthropic.com/engineering/harness-design-long-running-apps</a>
+    </p>
+  </div>
+</section>
+
+</main>
+</div>
+
+<footer>
+  本页是基于三家官方文章整理的学习型精读笔记，重点在于梳理工程思想与文章之间的逻辑关系，而不是替代官方原文。文中生产结果、成本和性能描述应放回各自特定模型、任务和时间点理解。
+</footer>
+
+</div>
+
+<script>
+document.querySelectorAll('.tabs button').forEach(btn=>{
+  btn.onclick=()=>{
+    document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(x=>x.classList.remove('active'));
+    btn.classList.add('active');
+    const p=document.getElementById(btn.dataset.p);
+    if(p)p.classList.add('active');
+  }
+});
+</script>
+</body>
+</html>
