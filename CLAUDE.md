@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `index.html`：站点首页，按日期分组的文章卡片列表，使用**相对链接**指向日期目录下的 HTML。
 - `README.md`：仓库说明 + 与首页同步的文章目录，使用 **GitHub Pages 绝对 URL**。
 - 日期目录（`9.11/`、`9.18/` …）：每篇笔记一个**自包含** HTML 文件——CSS 全部内联、原生 JS 实现交互（tabs / quiz / collapsible 等），无任何外部依赖或框架。
-- 日期目录内可能保留 Markdown 草稿（如 `agent harness_911.md`、无扩展名的 `agent eval_918`），是 HTML 成稿的素材/大纲，不发布。
+- 日期目录内可能保留 Markdown 草稿（如 `agent harness_911.md`、`agent eval_918.md`），是 HTML 成稿的素材/大纲，不发布。
 - 根目录 PDF 是本地参考资料，已被 `.gitignore`（`/*.pdf`）排除，不会提交或发布。
 
 ## 发布流程（每批新笔记）
