@@ -38,6 +38,8 @@
     h1 { margin: 0 0 12px; font-size: clamp(2rem, 7vw, 3.6rem); letter-spacing: -0.04em; }
     header p { margin: 0; color: var(--muted); font-size: 1.05rem; }
     .notes { display: grid; gap: 16px; }
+    .date { grid-column: 1 / -1; margin: 26px 0 -6px; color: var(--accent); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.06em; }
+    .date:first-child { margin-top: 0; }
     article {
       padding: 24px;
       background: var(--card);
@@ -61,6 +63,44 @@
     </header>
 
     <section class="notes" aria-label="文章列表">
+      <div class="date">2026-09-18</div>
+      <article>
+        <div class="tag">论文精读</div>
+        <h2><a href="./9.18/agent_evaluation_survey_acl2026_reading.html">A Survey on Evaluation of LLM-based Agents｜ACL 2026 综述精读</a></h2>
+        <p>围绕论文原始章节梳理 Agent 能力评测、四类应用、通用智能体、Benchmark 五大维度与开发评测平台。</p>
+      </article>
+
+      <article>
+        <div class="tag">论文精读</div>
+        <h2><a href="./9.18/agent_eval_llm_as_judge_mt_bench_arena_reading.html">LLM-as-a-Judge｜MT-Bench 与 Chatbot Arena · 论文精读</a></h2>
+        <p>29 页原文精读：研究设计、Judge 的三种形式、四类偏差、校准与人类一致性、实验数字与适用边界。</p>
+      </article>
+
+      <article>
+        <div class="tag">论文精读</div>
+        <h2><a href="./9.18/agent_eval_arena_hard_benchbuilder_reading.html">Arena-Hard × BenchBuilder｜论文精读</a></h2>
+        <p>从众包数据到高质量 Benchmark：BenchBuilder 流水线、关键实验、统计口径、局限与自测。</p>
+      </article>
+
+      <article>
+        <div class="tag">论文精读</div>
+        <h2><a href="./9.18/agent_eval_agent_as_a_judge_2025_reading.html">Agent-as-a-Judge｜论文精读</a></h2>
+        <p>43 页原文深度精读：DevAI 数据集、人工共识、Judge 架构、黑灰盒评测、消融实验与失败案例。</p>
+      </article>
+
+      <article>
+        <div class="tag">技术文章精读</div>
+        <h2><a href="./9.18/agent_eval_agent_arena_causal_methodology_reading.html">Agent Arena｜真实世界 Agent 因果评测</a></h2>
+        <p>官方技术文章精读：评测方法、关键实验、统计口径与局限。</p>
+      </article>
+
+      <article>
+        <div class="tag">工业实践</div>
+        <h2><a href="./9.18/agent_eval_industry_practices_langchain_volcengine.html">Agent Evaluation 工业实践精读｜LangChain × 火山引擎</a></h2>
+        <p>从评测方法到生产质量闭环的工程化实践。</p>
+      </article>
+
+      <div class="date">2026-09-11</div>
       <article>
         <div class="tag">论文精读</div>
         <h2><a href="./9.11/agent_harness_survey_learning_v4.html">Agent Harness Engineering: A Survey｜论文精读与解读</a></h2>
