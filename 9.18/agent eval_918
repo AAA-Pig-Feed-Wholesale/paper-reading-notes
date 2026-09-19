@@ -36,6 +36,8 @@ State Evaluation： Agent 是否正确改变了外部环境，例如文件、数
 
 > Agent Eval 不能只验证模型声称完成了什么，还需要验证系统实际执行了什么，以及环境最终发生了什么变化。
 
+![图 1：Agent Evaluation 到底在评什么——三个评测对象分别锚定过程、结果、环境](images/fig1_what_to_evaluate.png)
+
 ## 2. LLM-as-a-Judge：自动评分首先要解决的是评判器自身的可信度
 
 《Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena》是理解自动评价的重要起点。
@@ -126,6 +128,8 @@ From Crowdsourced Data to High-quality Benchmarks Arena-Hard and Benchbuilder Pi
 
 > 一个可靠的 Benchmark，不仅要有正确的评分方法，还应具有合理的任务分布、区分能力、统计稳定性和明确的适用范围。
 
+![图 2：BenchBuilder 六步流水线 + 七项质量标准 + 三个 Benchmark 健康度指标](images/fig2_benchbuilder_pipeline.png)
+
 对于业务 Agent，同样不能只使用几十条随机生成的问题，就直接用准确率代表线上真实表现。
 
 ## 4. Agent-as-a-Judge：从评价最终答案，进一步走向评价执行过程
@@ -172,6 +176,8 @@ Agent-as-a-Judge Evaluate Agents with Agents.pdf
 
 所以，Agent-as-a-Judge 更适合作为自动化评估的一种实现方式，而不是替代所有确定性检查和人工验收。
 
+![图 3：Requirements DAG（Success 从 0/1 到需求级）与 Judge 组件消融](images/fig3_requirements_dag_ablation.png)
+
 ## 5. 工业界开始把 Agent Eval 拆成不同执行粒度
 
 LangChain 在《Evaluating AI Agents at the Run, Trace, and Thread Level》中提出了一个比较实用的工程视角：根据 Agent 的执行结构，将评测分成 Run、Trace、Thread 三个层级。
@@ -201,6 +207,8 @@ Run 适合定位具体错误，Trace 适合验证单次任务是否可靠，Thre
 必要约束与允许变化的执行路径。
 
 这比预先规定一条标准 Workflow，让所有 Agent 完全照着执行，更符合非确定性系统的特点。
+
+![图 4：Run / Trace / Thread 三个评测粒度，与轨迹评测的必要约束 vs 允许变化](images/fig4_run_trace_thread.png)
 
 ## 6. Agent Arena：评测进一步进入真实环境和因果分析
 
@@ -333,3 +341,5 @@ Harness Design → Agent Execution → Trace & Outcome → Evaluation → Failur
 模型决定基础能力，Harness 负责组织和释放能力，而 Evaluation 提供判断系统是否真正达到目标的证据。
 
 当这三者形成可验证的反馈闭环，Agent 工程才有可能从依赖经验和个别 Demo，逐渐走向基于数据与实验的系统化迭代。
+
+![图 5：Harness × Evaluation 迭代闭环](images/fig5_harness_eval_loop.png)
