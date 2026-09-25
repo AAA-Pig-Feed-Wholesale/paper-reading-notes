@@ -8,6 +8,14 @@
 
 ## 当前内容
 
+### 2026-09-25
+
+| 主题 | 在线阅读 |
+| --- | --- |
+| Jev 原理与 Workflow Evals｜学习解读 | [阅读文章](https://aaa-pig-feed-wholesale.github.io/paper-reading-notes/9.25/jev_01_principles_and_workflow.html) |
+| Jev × Agent Systems：Harness 与 Evaluation 深度解读 | [阅读文章](https://aaa-pig-feed-wholesale.github.io/paper-reading-notes/9.25/jev_02_agent_systems_with_toc.html) |
+| Jev 工程实践：腾讯云 ADP 工单分流对比实验深度解读 | [阅读文章](https://aaa-pig-feed-wholesale.github.io/paper-reading-notes/9.25/jev_03_engineering_practice.html) |
+
 ### 2026-09-18
 
 | 主题 | 在线阅读 |
@@ -46,6 +54,8 @@ paper-reading-notes/
     ├── agent_eval_agent_arena_causal_methodology_reading.html
     └── agent_eval_industry_practices_langchain_volcengine.html
 ```
+
+9.25 批次新增 `9.25/`（Jev 主题三篇 HTML + Markdown 草稿与配图）。
 
 - 根目录保存网站首页、README 和发布配置。
 - 每次更新的文章按照日期放入对应目录。
