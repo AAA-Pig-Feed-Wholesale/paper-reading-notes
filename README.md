@@ -8,6 +8,15 @@
 
 ## 当前内容
 
+### 2026-10-02
+
+| 主题 | 在线阅读 |
+| --- | --- |
+| UAVs Meet LLMs｜论文精读 · Agentic UAV | [阅读文章](https://aaa-pig-feed-wholesale.github.io/paper-reading-notes/10.2/uavs_meet_llms_agentic_uav_learning.html) |
+| General-Purpose Aerial Intelligent Agents｜学习解读 | [阅读文章](https://aaa-pig-feed-wholesale.github.io/paper-reading-notes/10.2/general_purpose_aerial_agents_learning.html) |
+| Taking Flight with Dialogue｜PX4 Drone Agent 学习笔记 | [阅读文章](https://aaa-pig-feed-wholesale.github.io/paper-reading-notes/10.2/taking_flight_with_dialogue_learning.html) |
+| Agentic UAVs｜LLM-Driven Autonomy 学习笔记 | [阅读文章](https://aaa-pig-feed-wholesale.github.io/paper-reading-notes/10.2/agentic_uavs_llm_toolcalling_learning.html) |
+
 ### 2026-09-25
 
 | 主题 | 在线阅读 |
@@ -55,7 +64,7 @@ paper-reading-notes/
     └── agent_eval_industry_practices_langchain_volcengine.html
 ```
 
-9.25 批次新增 `9.25/`（Jev 主题三篇 HTML + Markdown 草稿与配图）。
+9.25 批次新增 `9.25/`（Jev 主题三篇 HTML + Markdown 草稿与配图）；10.2 批次新增 `10.2/`（Agentic UAV 主题四篇 HTML + Markdown 草稿与配图）。
 
 - 根目录保存网站首页、README 和发布配置。
 - 每次更新的文章按照日期放入对应目录。
