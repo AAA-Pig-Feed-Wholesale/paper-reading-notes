@@ -33,13 +33,32 @@
       font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
       line-height: 1.7;
     }
-    main { width: min(900px, calc(100% - 32px)); margin: 0 auto; padding: 72px 0; }
+    .layout { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 0; }
+    @media (min-width: 1024px) {
+      .layout { display: grid; grid-template-columns: minmax(0, 1fr) 200px; gap: 44px; padding: 72px 0; }
+      aside.toc { display: block; }
+      .toc-mobile { display: none; }
+    }
+    @media (max-width: 1023px) {
+      .layout { padding: 40px 0 60px; }
+      aside.toc { display: none; }
+      .toc-mobile {
+        position: sticky; top: 0; z-index: 40; background: var(--bg);
+        display: flex; gap: 8px; overflow-x: auto; padding: 12px 0;
+        border-bottom: 1px solid var(--border); margin-bottom: 28px;
+        scrollbar-width: none;
+      }
+      .toc-mobile::-webkit-scrollbar { display: none; }
+      .toc-mobile a {
+        flex: none; font-size: 13px; font-weight: 600; text-decoration: none;
+        color: var(--muted); border: 1px solid var(--border); border-radius: 20px; padding: 5px 14px;
+      }
+      .toc-mobile a.active { color: var(--bg); background: var(--accent); border-color: var(--accent); }
+    }
     header { margin-bottom: 40px; }
-    h1 { margin: 0 0 12px; font-size: clamp(2rem, 7vw, 3.6rem); letter-spacing: -0.04em; }
+    h1 { margin: 0 0 12px; font-size: clamp(2rem, 7vw, 3.2rem); letter-spacing: -0.04em; }
     header p { margin: 0; color: var(--muted); font-size: 1.05rem; }
     .notes { display: grid; gap: 16px; }
-    .date { grid-column: 1 / -1; margin: 26px 0 -6px; color: var(--accent); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.06em; }
-    .date:first-child { margin-top: 0; }
     article {
       padding: 24px;
       background: var(--card);
@@ -52,18 +71,86 @@
     a { color: inherit; text-decoration: none; }
     article p { margin: 0; color: var(--muted); }
     .tag { color: var(--accent); font-size: 0.85rem; font-weight: 700; letter-spacing: 0.04em; }
+    .date {
+      grid-column: 1 / -1; margin: 26px 0 -6px; color: var(--accent);
+      font-size: 0.85rem; font-weight: 700; letter-spacing: 0.06em;
+    }
+    .date:first-child { margin-top: 0; }
     footer { margin-top: 40px; color: var(--muted); font-size: 0.9rem; }
+
+    /* ---- 侧边导航 ---- */
+    aside.toc .box {
+      position: sticky; top: 72px; border: 1px solid var(--border); background: var(--card);
+      border-radius: 14px; padding: 16px 14px;
+    }
+    aside.toc h2 { font-size: 12px; letter-spacing: 0.12em; color: var(--muted); margin: 2px 4px 10px; }
+    aside.toc a {
+      display: block; padding: 7px 10px; border-radius: 8px; font-size: 13px;
+      color: var(--muted); line-height: 1.45;
+    }
+    aside.toc a small { display: block; font-size: 11px; opacity: 0.75; }
+    aside.toc a:hover { background: var(--bg); color: var(--text); text-decoration: none; }
+    aside.toc a.active { background: var(--accent); color: #fff; }
+
+    /* ---- Markdown 草稿区 ---- */
+    .mdnotes {
+      grid-column: 1 / -1; background: var(--card); border: 1px dashed var(--border);
+      border-radius: 14px; padding: 14px 18px;
+    }
+    .mdhead {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 10px;
+    }
+    .mdlist { display: flex; flex-wrap: wrap; gap: 8px; }
+    .mdlist button {
+      font: 600 13px/1.4 inherit; font-family: inherit; color: var(--text); cursor: pointer;
+      background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 6px 15px;
+      transition: border-color 140ms ease, color 140ms ease;
+    }
+    .mdlist button:hover { border-color: var(--accent); color: var(--accent); }
+    .mdlist button.open { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .mdview { margin-top: 14px; border-top: 1px solid var(--border); padding-top: 18px; }
+    .mdview .loading { color: var(--muted); font-size: 14px; }
+    .mdview .err { color: #b3564d; font-size: 14px; }
+
+    /* ---- Markdown 渲染样式 ---- */
+    .md h1 { font-size: 1.7rem; margin: 0 0 16px; letter-spacing: -0.02em; line-height: 1.35; }
+    .md h2 { font-size: 1.3rem; margin: 28px 0 10px; line-height: 1.4; }
+    .md h3 { font-size: 1.08rem; margin: 22px 0 8px; color: var(--text); }
+    .md p { margin: 10px 0; color: var(--text); }
+    .md strong { color: var(--text); }
+    .md ul, .md ol { margin: 10px 0; padding-left: 24px; color: var(--text); }
+    .md li { margin: 4px 0; }
+    .md blockquote {
+      margin: 14px 0; padding: 10px 16px; border-left: 3px solid var(--accent);
+      background: var(--bg); border-radius: 0 8px 8px 0; color: var(--text);
+    }
+    .md pre {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+      padding: 14px 16px; overflow-x: auto; font-size: 13px; line-height: 1.6; margin: 12px 0;
+    }
+    .md code { font-family: ui-monospace, Consolas, monospace; font-size: 0.9em; }
+    .md p code, .md li code { background: var(--bg); border: 1px solid var(--border); border-radius: 5px; padding: 1px 6px; }
+    .md img { max-width: 100%; border: 1px solid var(--border); border-radius: 12px; margin: 10px 0; display: block; }
+    .md hr { border: 0; border-top: 1px solid var(--border); margin: 22px 0; }
+    .md table { border-collapse: collapse; width: 100%; margin: 12px 0; font-size: 0.92rem; }
+    .md th, .md td { border: 1px solid var(--border); padding: 8px 12px; text-align: left; }
+    .md th { background: var(--bg); }
+    .md a { color: var(--accent); }
+    .md a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
+<div class="layout">
   <main>
     <header>
       <h1>论文阅读笔记</h1>
       <p>记录论文、技术文章与研究资料中的关键观点和个人理解。</p>
     </header>
 
+    <nav class="toc-mobile" aria-label="日期导航"></nav>
+
     <section class="notes" aria-label="文章列表">
-      <div class="date">2026-10-02</div>
+      <div class="date" id="d-2026-10-02">2026-10-02 · Agentic UAV</div>
       <article>
         <div class="tag">论文精读</div>
         <h2><a href="./10.2/uavs_meet_llms_agentic_uav_learning.html">UAVs Meet LLMs｜论文精读 · Agentic UAV</a></h2>
@@ -88,7 +175,9 @@
         <p>五层架构、Tool Calling 与认知推理的整合设计。</p>
       </article>
 
-      <div class="date">2026-09-25</div>
+      <div class="mdnotes" data-group="2026-10-02"></div>
+
+      <div class="date" id="d-2026-09-25">2026-09-25 · Jev</div>
       <article>
         <div class="tag">技术文章解读</div>
         <h2><a href="./9.25/jev_01_principles_and_workflow.html">Jev 原理与 Workflow Evals｜学习解读</a></h2>
@@ -107,7 +196,9 @@
         <p>Jev 与通用 LLM 在客服工单分流上的对比实验与工程取舍。</p>
       </article>
 
-      <div class="date">2026-09-18</div>
+      <div class="mdnotes" data-group="2026-09-25"></div>
+
+      <div class="date" id="d-2026-09-18">2026-09-18 · Agent Evaluation</div>
       <article>
         <div class="tag">论文精读</div>
         <h2><a href="./9.18/agent_evaluation_survey_acl2026_reading.html">A Survey on Evaluation of LLM-based Agents｜ACL 2026 综述精读</a></h2>
@@ -144,7 +235,9 @@
         <p>从评测方法到生产质量闭环的工程化实践。</p>
       </article>
 
-      <div class="date">2026-09-11</div>
+      <div class="mdnotes" data-group="2026-09-18"></div>
+
+      <div class="date" id="d-2026-09-11">2026-09-11 · Agent Harness</div>
       <article>
         <div class="tag">论文精读</div>
         <h2><a href="./9.11/agent_harness_survey_learning_v4.html">Agent Harness Engineering: A Survey｜论文精读与解读</a></h2>
@@ -162,9 +255,186 @@
         <h2><a href="./9.11/agent_harness_industry_openai_langchain_anthropic.html">Agent Harness 工业实践三篇精读｜OpenAI × LangChain × Anthropic</a></h2>
         <p>对三种 Agent Harness 工业实践路径的阅读与整理。</p>
       </article>
+
+      <div class="mdnotes" data-group="2026-09-11"></div>
     </section>
 
     <footer>持续更新中</footer>
   </main>
+
+  <aside class="toc" aria-label="目录导航">
+    <div class="box">
+      <h2>目录 / CONTENTS</h2>
+      <div id="toc-links"></div>
+    </div>
+  </aside>
+</div>
+
+<script>
+/* ================= 配置：各批次 Markdown 总结复盘（新批次在此登记） ================= */
+const MD_NOTES = {
+  "2026-10-02": [{ file: "10.2/agentic_uav_1002.md", title: "Agentic UAV 学习总结" }],
+  "2026-09-25": [{ file: "9.25/jev_925.md", title: "Jev 学习总结" }],
+  "2026-09-18": [{ file: "9.18/agent eval_918.md", title: "Agent Evaluation 阅读总结" }],
+  "2026-09-11": [{ file: "9.11/agent harness_911.md", title: "Agent Harness 阅读总结" }],
+};
+
+const GROUP_LABELS = {
+  "2026-10-02": "Agentic UAV", "2026-09-25": "Jev",
+  "2026-09-18": "Agent Evaluation", "2026-09-11": "Agent Harness",
+};
+
+/* ================= 侧边导航（自动生成 + 滚动高亮） ================= */
+const dates = [...document.querySelectorAll(".date")];
+const asideBox = document.getElementById("toc-links");
+const mobileNav = document.querySelector(".toc-mobile");
+
+function buildNav() {
+  let html = "";
+  dates.forEach(d => {
+    const id = d.id.replace("d-", "");
+    html += `<a href="#d-${id}" data-target="d-${id}">${id}<small>${GROUP_LABELS[id] || ""}</small></a>`;
+  });
+  asideBox.innerHTML = html;
+  mobileNav.innerHTML = dates.map(d =>
+    `<a href="#d-${d.id.replace('d-', '')}" data-target="${d.id}">${d.textContent.split(" · ")[1] || d.id}</a>`).join("");
+}
+buildNav();
+
+function highlightNav() {
+  const links = [...asideBox.querySelectorAll("a"), ...mobileNav.querySelectorAll("a")];
+  let current = dates[0];
+  for (const d of dates) if (d.getBoundingClientRect().top < 160) current = d;
+  links.forEach(a => a.classList.toggle("active", a.dataset.target === current.id));
+}
+window.addEventListener("scroll", highlightNav, { passive: true });
+highlightNav();
+
+/* ================= Markdown 草稿区（fetch + 内嵌渲染器） ================= */
+function esc(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+function urlOf(path) {  // 路径按段编码（兼容文件名中的空格）
+  return path.split("/").map(encodeURIComponent).join("/");
+}
+
+function inline(s, base) {
+  const codes = [];
+  s = s.replace(/`([^`]+)`/g, (_, c) => { codes.push(c); return `\u0000${codes.length - 1}\u0000`; });
+  s = esc(s);
+  s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)[^)]*\)/g, (_, alt, src) => {
+    const abs = /^(https?:|data:)/.test(src) ? src : urlOf(base + src);
+    return `<img src="${abs}" alt="${alt}" loading="lazy">`;
+  });
+  s = s.replace(/\[([^\]]+)\]\(([^)\s]+)[^)]*\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+  s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+  s = s.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, "$1<em>$2</em>");
+  s = s.replace(/\u0000(\d+)\u0000/g, (_, i) => `<code>${esc(codes[+i])}</code>`);
+  return s;
+}
+
+function mdToHtml(src, base) {
+  const lines = src.split(/\r?\n/);
+  const out = [];
+  let i = 0, listType = null, para = [], quote = [];
+
+  const flushPara = () => { if (para.length) { out.push(`<p>${inline(para.join(" "), base)}</p>`); para = []; } };
+  const flushList = () => { if (listType) { out.push(`</${listType}>`); listType = null; } };
+  const flushQuote = () => {
+    if (quote.length) { out.push(`<blockquote>${inline(quote.join(" "), base)}</blockquote>`); quote = []; }
+  };
+  const flushAll = () => { flushPara(); flushList(); flushQuote(); };
+
+  while (i < lines.length) {
+    const ln = lines[i];
+
+    if (/^```/.test(ln)) {                       // 代码块
+      flushAll();
+      const buf = [];
+      i++;
+      while (i < lines.length && !/^```/.test(lines[i])) buf.push(lines[i++]);
+      i++;
+      out.push(`<pre><code>${esc(buf.join("\n"))}</code></pre>`);
+      continue;
+    }
+    if (/^\s*$/.test(ln)) { flushAll(); i++; continue; }
+
+    const h = ln.match(/^(#{1,4})\s+(.*)/);      // 标题
+    if (h) { flushAll(); const lv = Math.min(h[1].length + 0, 4); out.push(`<h${lv}>${inline(h[2], base)}</h${lv}>`); i++; continue; }
+
+    if (/^\s*(-{3,}|\*{3,})\s*$/.test(ln)) {     // 分隔线
+      flushAll(); out.push("<hr>"); i++; continue;
+    }
+
+    const q = ln.match(/^>\s?(.*)/);             // 引用
+    if (q) { flushPara(); flushList(); quote.push(q[1]); i++; continue; }
+    flushQuote();
+
+    const ul = ln.match(/^\s*[-*]\s+(.*)/);      // 无序列表
+    const ol = ln.match(/^\s*\d+[.、]\s+(.*)/);  // 有序列表
+    if (ul || ol) {
+      flushPara();
+      const t = ul ? "ul" : "ol";
+      if (listType !== t) { flushList(); out.push(`<${t}>`); listType = t; }
+      out.push(`<li>${inline((ul || ol)[1], base)}</li>`);
+      i++; continue;
+    }
+    flushList();
+
+    if (/^\s*\|.*\|\s*$/.test(ln)) {             // 表格
+      flushPara();
+      const rows = [];
+      while (i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])) rows.push(lines[i++]);
+      const cells = r => r.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map(c => c.trim());
+      const head = cells(rows[0]);
+      let html = "<table><thead><tr>" + head.map(c => `<th>${inline(c, base)}</th>`).join("") + "</tr></thead><tbody>";
+      for (let r = 2; r < rows.length; r++) {
+        html += "<tr>" + cells(rows[r]).map(c => `<td>${inline(c, base)}</td>`).join("") + "</tr>";
+      }
+      out.push(html + "</tbody></table>");
+      continue;
+    }
+
+    para.push(ln.trim());                        // 普通段落
+    i++;
+  }
+  flushAll();
+  return out.join("\n");
+}
+
+document.querySelectorAll(".mdnotes").forEach(box => {
+  const group = box.dataset.group;
+  const items = MD_NOTES[group] || [];
+  if (!items.length) { box.style.display = "none"; return; }
+
+  box.innerHTML =
+    `<div class="mdhead">总结复盘 · MARKDOWN</div>
+     <div class="mdlist">${items.map((it, idx) =>
+       `<button data-idx="${idx}">${esc(it.title)}</button>`).join("")}</div>
+     <div class="mdview" hidden></div>`;
+
+  const view = box.querySelector(".mdview");
+  const buttons = [...box.querySelectorAll("button")];
+  buttons.forEach(btn => btn.addEventListener("click", async () => {
+    const isOpen = btn.classList.contains("open");
+    buttons.forEach(b => b.classList.remove("open"));
+    if (isOpen) { view.hidden = true; return; }
+    btn.classList.add("open");
+    view.hidden = false;
+    view.innerHTML = '<p class="loading">加载中…</p>';
+    view.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    const item = items[+btn.dataset.idx];
+    const base = item.file.replace(/[^/]*$/, "");
+    try {
+      const res = await fetch(urlOf(item.file));
+      if (!res.ok) throw new Error(res.status);
+      const md = await res.text();
+      view.innerHTML = `<div class="md">${mdToHtml(md, base)}</div>`;
+    } catch (e) {
+      view.innerHTML = `<p class="err">加载失败（${esc(String(e))}）——本地直接打开文件时受浏览器限制，请通过 HTTP 访问或 GitHub Pages 在线版。</p>`;
+    }
+  }));
+});
+</script>
 </body>
 </html>

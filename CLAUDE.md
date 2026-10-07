@@ -11,13 +11,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `index.html`：站点首页，按日期分组的文章卡片列表，使用**相对链接**指向日期目录下的 HTML。
 - `README.md`：仓库说明 + 与首页同步的文章目录，使用 **GitHub Pages 绝对 URL**。
 - 日期目录（`9.11/`、`9.18/` …）：每篇笔记一个**自包含** HTML 文件——CSS 全部内联、原生 JS 实现交互（tabs / quiz / collapsible 等），无任何外部依赖或框架。
-- 日期目录内可能保留 Markdown 草稿（如 `agent harness_911.md`、`agent eval_918.md`），是 HTML 成稿的素材/大纲，不发布。
+- 日期目录内可能保留 Markdown 总结复盘（如 `agent harness_911.md`、`agent eval_918.md`）。`index.html` 内嵌轻量 Markdown 渲染器，通过脚本里的 `MD_NOTES` 配置在首页就地展开阅读——**新批次的 md 需登记到 `MD_NOTES`**（文件路径按段编码处理空格，配图相对路径自动重写）。
 - 根目录 PDF 是本地参考资料，已被 `.gitignore`（`/*.pdf`）排除，不会提交或发布。
 
 ## 发布流程（每批新笔记）
 
 1. 新建日期目录（如 `9.19/`），HTML 文件放入其中；命名沿用同批模式（9.18 为 `agent_eval_*_reading.html`）。
-2. 在 `index.html` **和** `README.md` 两处都登记新文章——这两个目录必须同步维护，缺一会导致首页或仓库页看不到新文章。
+2. 在 `index.html` **和** `README.md` 两处都登记新文章，md 总结复盘登记到 `index.html` 的 `MD_NOTES` 配置——这几处目录必须同步维护，缺一会导致首页或仓库页看不到新文章。
 3. 提交并推送到 `main`，GitHub Pages 自动重新发布。无本地构建步骤；本地预览直接用浏览器打开 `index.html`。
 
 ## 写作约定
